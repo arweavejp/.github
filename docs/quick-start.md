@@ -24,18 +24,18 @@ Arweave ストレージを活用した分散型計算プロトコルです。既
 
 まずは Arweave を触ってみましょう！
 
-- [Arweave ウォレット導入](./quick-start/wallet.md)
-- [ファイルアップロード](./quick-start/upload-files.md)
-- 分散型アプリケーションのデプロイ
-- Arweave ドメイン名の設定
+1. [Arweave ウォレット導入](./quick-start/wallet.md)
+2. [ファイルアップロード](./quick-start/upload-files.md)
+3. [分散型アプリケーションのデプロイ](./quick-start/deploy-app.md)
+4. Arweave ドメイン名の設定
 
 ## 中級編
 
 AOS を導入して AO 上にアプリを作ってみましょう！
 
-- AOS を使ってみる
-- AOS Lua ハンドラー開発
-- フロントエンドから AO に接続
+5. AOS を使ってみる
+6. AOS Lua ハンドラー開発
+7. フロントエンドから AO に接続
 
 ## 上級編
 
@@ -43,8 +43,8 @@ Arweave / AO の仕様を深く理解して独自の分散型 VM を作ってみ
 
 ***2024年8月に開催される AO ブートキャンプに合わせてより詳細に更新予定です。***
 
-- ローカル開発環境の設定
-- ANS-104
-- GraphQL によるデータアクセス
-- AO Spec （MU / SU / CU）
-- AO Compute Unit (VM) の開発
+8. ローカル開発環境の設定
+9. ANS-104
+10. GraphQL によるデータアクセス
+11. AO Spec （MU / SU / CU）
+12. AO Compute Unit (VM) の開発
