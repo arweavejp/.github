@@ -18,6 +18,11 @@ Arweave Japan は [Arweave](https://arweave.org/) / [AO](https://ao.arweave.dev/
 - AO ハッカソン （2024年9月）
 - Arweave 公式日本カンファレンス （2025年春）
 
+## Arweave / AO クイック入門
+
+- [Arweave / AO リソースまとめ](../docs/resources.md)
+- Arweave / AO 開発入門
+
 ## エコシステムパートナー募集
 
 Arweave Japan は Arweave / AO での開発に興味関心をお持ちのエコシステムパートナー様を募集しています。
