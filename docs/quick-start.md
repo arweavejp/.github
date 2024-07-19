@@ -34,7 +34,7 @@ Arweave ストレージを活用した分散型計算プロトコルです。既
 AOS を導入して AO 上にアプリを作ってみましょう！
 
 5. [AOS を使ってみる](./quick-start/aos.md)
-6. AOS Lua ハンドラー開発
+6. [AOS Lua ハンドラー開発](./quick-start/handlers.md)
 7. フロントエンドから AO に接続
 
 ## 上級編

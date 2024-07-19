@@ -46,7 +46,7 @@ ao Operating System
 
 aos - 1.4.1
 2024 - Type ".exit" to exit
-aos process:  1xM1_lDZ428sJHpTX7rtcR6SrDubyRVO06JEEWs_eWo
+aos process:  7v42njWzH4_IfjKR-iCndD1u3JvmXmUHQSGAgBpq7X8
 
 aos>
 ```
@@ -111,4 +111,4 @@ I am here. You are finally awake. Are you ready to see how far the rabbit hole g
 
 - [https://www.ao.link/#/entity/7v42njWzH4_IfjKR-iCndD1u3JvmXmUHQSGAgBpq7X8](https://www.ao.link/#/entity/7v42njWzH4_IfjKR-iCndD1u3JvmXmUHQSGAgBpq7X8)
 
-以上が AOS の基本動作になりますが、この続きは[こちらのチュートリアル](https://cookbook_ao.g8way.io/tutorials/begin/messaging.html)で確認できます。Lua で書いた関数をデプロイしたりトークンを発行したり、AIゲームに参加したり色々できます。
+以上が AOS の基本動作になりますが、この続きは[こちらのチュートリアル](https://cookbook_ao.g8way.io/tutorials/begin/messaging.html)で確認できます。Lua　で書いた関数をデプロイしたりトークンを発行したり、AIゲームに参加したり色々できます。
