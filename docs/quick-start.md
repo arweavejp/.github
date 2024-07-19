@@ -25,7 +25,7 @@ Arweave ストレージを活用した分散型計算プロトコルです。既
 まずは Arweave を触ってみましょう！
 
 - [Arweave ウォレット導入](./quick-start/wallet.md)
-- ファイルアップロード
+- [ファイルアップロード](./quick-start/upload-files.md)
 - 分散型アプリケーションのデプロイ
 - Arweave ドメイン名の設定
 
