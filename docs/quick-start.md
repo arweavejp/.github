@@ -35,7 +35,7 @@ AOS を導入して AO 上にアプリを作ってみましょう！
 
 5. [AOS を使ってみる](./quick-start/aos.md)
 6. [AOS Lua ハンドラー開発](./quick-start/handlers.md)
-7. フロントエンドから AO に接続
+7. [フロントエンドから AO に接続](./quick-start/aoconnect.md)
 
 ## 上級編
 

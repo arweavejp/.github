@@ -16,8 +16,8 @@ Handlers.add(
    "Get", -- ハンドラー名
    Handlers.utils.hasMatchingTag("Action", "Get"), -- マッチング条件 Action == Get
    function (msg)
-     assert(type(msg.Key) == 'string', 'Key is required!') -- Key 存在チェック
-	 ao.send({ Target = msg.From, Value = Store[msg.Key] }) -- 送り手に値を返す
+      assert(type(msg.Key) == 'string', 'Key is required!') -- Key 存在チェック
+      ao.send({ Target = msg.From, Value = Store[msg.Key] }) -- 送り手に値を返す
    end
 )
 
@@ -25,10 +25,10 @@ Handlers.add(
    "Set", -- ハンドラー名
    Handlers.utils.hasMatchingTag("Action", "Set"), -- マッチング条件 Action == Set
    function (msg)
-     assert(type(msg.Key) == 'string', 'Key is required!') -- Key 存在チェック
-	 assert(type(msg.Value) == 'string', 'Value is required!') -- Value 存在チェック
-	 Store[msg.Key] = msg.Value -- Value を　Store に収納
-     Handlers.utils.reply("Value stored!")(msg) -- 送り手に処理完了の返信
+      assert(type(msg.Key) == 'string', 'Key is required!') -- Key 存在チェック
+      assert(type(msg.Value) == 'string', 'Value is required!') -- Value 存在チェック
+      Store[msg.Key] = msg.Value -- Value を　Store に収納
+      Handlers.utils.reply("Value stored!")(msg) -- 送り手に処理完了の返信
    end
 )
 ```
