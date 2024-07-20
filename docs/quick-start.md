@@ -43,8 +43,8 @@ Arweave / AO の仕様を深く理解して独自の分散型 VM を作ってみ
 
 ***2024年8月に開催される AO ブートキャンプに合わせてより詳細に更新予定です。***
 
-8. ローカル開発環境の設定
-9. ANS-104
-10. GraphQL によるデータアクセス
-11. AO Spec （MU / SU / CU）
-12. AO Compute Unit (VM) の開発
+8. [ローカル開発環境の設定](./quick-start/local-environment.md)
+9. [ANS-104](./quick-start/ans-104.md)
+10. [GraphQL によるデータアクセス](./quick-start/graphql.md)
+11. [AO Spec （MU / SU / CU）](./quick-start/ao.md)
+12. [AO Compute Unit (VM) の開発](./quick-start/cu.md)

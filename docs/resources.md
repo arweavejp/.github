@@ -49,6 +49,7 @@ Arweave 上に構築された分散型 Web のことを Permaweb と呼びます
 - [ViewBlock](https://viewblock.io/arweave) - Arweave エクスプローラ
 - [areweave-js](https://github.com/ArweaveTeam/arweave-js) - Arweave の Javascript ライブラリ
 - [arkb](https://github.com/textury/arkb) - Arweave にデータをアップロードするツール
+- [arbundles](https://github.com/Irys-xyz/arbundles) - 104-ANS Bundle メッセージ構築ツール
 - [arlocal](https://github.com/textury/arlocal) - ローカル環境の　Arweave　ノードを走らせるツール
 - [scar](https://github.com/renzholy/scar) - Arweave の簡易エクスプローラ
 
