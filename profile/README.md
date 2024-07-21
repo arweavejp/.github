@@ -36,3 +36,4 @@ Arweave Japan は Arweave / AO での開発に興味関心をお持ちのエコ�
 ## コミュニティ
 
 - [X アカウント (@arweavejp)](https://x.com/arweavejp)
+- [ディスコード](https://discord.gg/bB4N7fAMmp)
