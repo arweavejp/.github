@@ -10,6 +10,10 @@ ArConnect の使い方は公式サイトをご参照下さい。
 
 - [ArConnect](https://arconnect.io)
 
+## 開発用 $AR トークン配布
+
+Arweave Japan の[ディスコード](https://discord.gg/bB4N7fAMmp)にて開発用に小額の $AR トークンを配布しています。
+
 ### $AR トークン購入と $AO トークンの自動配布
 
 $AR トークンの一番簡単な取得方法は ArConnect ウォレット内にある購入機能を通じて [Transac](https://transak.com/) から購入することです。日本からだとクレジットカードや Google Pay 、Apple Pay がご利用可能です。
