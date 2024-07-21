@@ -1,4 +1,4 @@
-# Arweave JAPAN とは？
+# Arweave Japan とは？
 
 Arweave Japan は [Arweave](https://arweave.org/) / [AO](https://ao.arweave.dev/) の日本語ビルダーエコシステム構築を目的とした分散型組織です。
 

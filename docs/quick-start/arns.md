@@ -1,5 +1,7 @@
 # Arweave ドメイン名の設定
 
+***ArNS は現在テストネットでこちらで取得したトークンやドメインはメインネット移行時に無効になる可能性があります。***
+
 [ArNS (Arewave Name System)](https://arns.app) でドメイン名を取得すると Arweave にデプロイしたファイルやアプリにドメインを設定することができ、無数にある Arweave のゲートウェイからアクセス可能になります。
 
 例えば、 `tomo` というドメイン名を [xYMDxvWMK2QYY47u-RpjaF-LT7fFE6ihDeoKG6sVjb8](https://arweave.net/xYMDxvWMK2QYY47u-RpjaF-LT7fFE6ihDeoKG6sVjb8) に設定した場合、
@@ -17,8 +19,20 @@
 - ar://about_tomo
 - ar://social_tomo
 
-ArNS は現在テストネット中で、ドメインの購入には `tIO` トークンが必要になります。一般配布はされていないので、こちらの取得方法は後日更新します。
+## $tIO トークン取得
 
-また、既にドメイン名を取得済みの場合、[ARIO SDK](https://github.com/ar-io/ar-io-sdk) を使ってプログラマブルにドメイン設定を変更できます。
+ArNS は現在テストネット中で、ドメインの購入には `tIO` トークンが必要になります。一般配布はされていないので、 DEX から取得する必要があります。
+
+$AR を持っていない場合の取得手順です。
+
+1. [ArConnect](https://www.arconnect.io/) から $AR を購入
+2. [AOX](https://aox.xyz/#/beta) で $AR を AO にブリッジして $wAR を取得
+3. [Permaswap](https://www.permaswap.network/#/ao) で $wAR を $tIO に交換
+
+***$tIO の購入に $AR が必要になりますが、 $tIO 自体は ArNS テストネット用のテストネットトークンでメインネット移行時にどちらも無効になる可能性が高いことにご留意下さい。***
+
+## AR.IO SDK
+
+また、既にドメイン名を取得済みの場合、[AR.IO SDK](https://github.com/ar-io/ar-io-sdk) を使ってプログラマブルにドメイン設定を変更できます。
 
 Arweave ドメイン名は 分散型コンピュータ AO によって管理されています。
