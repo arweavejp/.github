@@ -17,7 +17,7 @@ Handlers.add(
    Handlers.utils.hasMatchingTag("Action", "Get"), -- マッチング条件 Action == Get
    function (msg)
       assert(type(msg.Key) == 'string', 'Key is required!') -- Key 存在チェック
-      ao.send({ Target = msg.From, Value = Store[msg.Key] }) -- 送り手に値を返す
+      ao.send({ Target = msg.From, Tags = { Value = Store[msg.Key] }}) -- 送り手に値を返す
    end
 )
 
@@ -52,7 +52,7 @@ aos> .load store.lua
 `Target` に自分のプロセス ID `ao.id` を指定し、`Key` と `Value`　を指定して `Set` Action を実行するメッセージを送ります。
 
 ```bash
-aos> Send({ Target = ao.id, Action = "Set", Key = "fruit", Value = "apple" })
+aos> Send({ Target = ao.id, Tags = { Action = "Set", Key = "fruit", Value = "apple" }})
 ```
 
 ## 保存した値を取得
@@ -60,7 +60,7 @@ aos> Send({ Target = ao.id, Action = "Set", Key = "fruit", Value = "apple" })
 同様に `Get` Action のメッセージを送ります。
 
 ```bash
-aos> Send({ Target = ao.id, Action = "Get", Key = "fruit" })
+aos> Send({ Target = ao.id, { Action = "Get", Key = "fruit" }})
 ```
 
 Inbox に `Value` が返信されます。
