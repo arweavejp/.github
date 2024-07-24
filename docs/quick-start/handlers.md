@@ -60,7 +60,7 @@ aos> Send({ Target = ao.id, Tags = { Action = "Set", Key = "fruit", Value = "app
 同様に `Get` Action のメッセージを送ります。
 
 ```bash
-aos> Send({ Target = ao.id, { Action = "Get", Key = "fruit" }})
+aos> Send({ Target = ao.id, Tags = { Action = "Get", Key = "fruit" }})
 ```
 
 Inbox に `Value` が返信されます。
