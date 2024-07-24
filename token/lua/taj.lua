@@ -198,13 +198,13 @@ Handlers.add(
    "balance",
    Handlers.utils.hasMatchingTag("Action", "Balance"),
    function (msg)
-      assert(type(msg.Tags.Target) == "string", "Target Tag is required!")
+      local target = msg.Tags.Target or msg.From
       local bal = "0"
-      if balances[msg.Tags.Target] then
-	 bal = tostring(balances[msg.Tags.Target])
+      if balances[target] then
+	 bal = tostring(balances[target])
       end
       ao.send({Target = msg.From, Tags = {
-		  Target = msg.From,
+		  Target = target,
 		  Balance = bal,
 		  Ticker = ticker or ""
       }})
