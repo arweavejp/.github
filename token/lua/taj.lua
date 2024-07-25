@@ -21,6 +21,10 @@ if ticker ~= "tAJ" then
    ticker = "tAJ"
 end
 
+if logo ~= "-xO99q2LEMRLj2w5HUkoUVvFfsbx_fCD-mFbaL831W4" then
+   logo = "-xO99q2LEMRLj2w5HUkoUVvFfsbx_fCD-mFbaL831W4"
+end
+
 if denomination ~= 6 then
    denomination = 6
 end
@@ -230,6 +234,7 @@ Handlers.add(
       ao.send({Target = msg.From, Tags = {
 		  Name = name,
 		  Ticker = ticker,
+		  Logo = logo,
 		  Denomination = tostring(denomination)
       }})
    end
