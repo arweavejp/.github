@@ -17,7 +17,7 @@ function App() {
 
   const colors = ["Color", "Black", "White"]
   const types = ["Logotype", "Glyph"]
-  let color1 = black
+  let color1 = text
   let color2 = red
   let bg = white
   if (color === "White") {
