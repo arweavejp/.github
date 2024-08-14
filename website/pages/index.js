@@ -69,9 +69,11 @@ export default function Home() {
   const [profile, setProfile] = useState(null)
   const [members, setMembers] = useState({})
   const [memberProfiles, setMemberProfiles] = useState([])
+
   useEffect(() => {
     if (window.arweaveWallet) setIsArconnect(true)
   }, [])
+
   useEffect(() => {
     ;(async () => {
       try {
@@ -152,6 +154,7 @@ export default function Home() {
       } catch (e) {}
     })()
   }, [])
+
   useEffect(() => {
     ;(async () => {
       if (addr) {
@@ -166,6 +169,7 @@ export default function Home() {
       }
     })()
   }, [addr])
+
   useEffect(() => {
     ;(async () => {
       let ids = []
@@ -186,66 +190,80 @@ export default function Home() {
       }
     })()
   }, [members])
+
+  const checkVouchDAO = async _init => {
+    const _res = await dryrun({
+      process: "ZTTO02BL2P-lseTLUgiIPD9d0CF1sc4LbMA2AQ7e9jo",
+      tags: [action("Get-Vouches"), tag("ID", addr)],
+    })
+    const vouches = JSON.parse(_res.Messages[0].Data)
+    if (vouches["Vouches-For"] === addr) {
+      for (const k in vouches.Vouchers) {
+        if (k === "Ax_uXyLQBPZSQ15movzv9-O1mDo30khslqN64qD27Z8") {
+          const v = vouches.Vouchers[k]
+          if (Number(v.Value.split("-")[0]) > 0) {
+            _init = false
+            setVouched(v)
+            await lf.setItem("vouched", v)
+          } else {
+            alert("Vouch スコアが 0 以上の X アカウントが必要です。")
+          }
+          break
+        }
+      }
+    }
+    if (!_init) setActiveStep(2)
+    return _init
+  }
+  const checkAOProfile = async _init => {
+    const _res2 = await dryrun({
+      process: "SNy4m-DrqxWl01YqGM4sxI8qCni-58re8uuJLvZPypY",
+      tags: [action("Get-Profiles-By-Delegate")],
+      data: JSON.stringify({ Address: addr }),
+    })
+    const data = _res2?.Messages?.[0]?.Data
+    if (!data) {
+      setInit(_init)
+      return _init
+    }
+    const profile = JSON.parse(data)[0]
+    if (!profile) {
+      setInit(_init)
+      return _init
+    }
+    const prid = profile.ProfileId
+    const _res3 = await dryrun({
+      process: "SNy4m-DrqxWl01YqGM4sxI8qCni-58re8uuJLvZPypY",
+      tags: [action("Get-Metadata-By-ProfileIds")],
+      data: JSON.stringify({ ProfileIds: [prid] }),
+    })
+    if (!_res3?.Messages?.[0]?.Data) {
+      setInit(_init)
+      return _init
+    }
+    const profiles = JSON.parse(_res3.Messages[0].Data)
+    const pr = fromPairs(profiles.map(obj => [obj.ProfileId, obj]))[prid]
+    if (pr) {
+      _init = false
+      setProfile(pr)
+      await lf.setItem("profile", pr)
+    }
+    if (!_init) setActiveStep(3)
+    return _init
+  }
+
   useEffect(() => {
     ;(async () => {
       if (activeStep === 0) return
       let _init = true
       if (activeStep === 1) {
-        const _res = await dryrun({
-          process: "ZTTO02BL2P-lseTLUgiIPD9d0CF1sc4LbMA2AQ7e9jo",
-          tags: [action("Get-Vouches"), tag("ID", addr)],
-        })
-        const vouches = JSON.parse(_res.Messages[0].Data)
-        if (vouches["Vouches-For"] === addr) {
-          for (const k in vouches.Vouchers) {
-            if (k === "Ax_uXyLQBPZSQ15movzv9-O1mDo30khslqN64qD27Z8") {
-              const v = vouches.Vouchers[k]
-              if (Number(v.Value.split("-")[0]) > 0) {
-                _init = false
-                setActiveStep(2)
-                setVouched(v)
-                await lf.setItem("vouched", v)
-              } else {
-                alert("Vouch スコアが 0 以上の X アカウントが必要です。")
-              }
-              break
-            }
-          }
-        }
+        _init = await checkVouchDAO(true)
+        setInit(_init)
+        return
       } else if (activeStep === 2) {
-        const _res2 = await dryrun({
-          process: "SNy4m-DrqxWl01YqGM4sxI8qCni-58re8uuJLvZPypY",
-          tags: [action("Get-Profiles-By-Delegate")],
-          data: JSON.stringify({ Address: addr }),
-        })
-        const data = _res2?.Messages?.[0]?.Data
-        if (!data) {
-          setInit(_init)
-          return
-        }
-        const profile = JSON.parse(data)[0]
-        if (!profile) {
-          setInit(_init)
-          return
-        }
-        const prid = profile.ProfileId
-        const _res3 = await dryrun({
-          process: "SNy4m-DrqxWl01YqGM4sxI8qCni-58re8uuJLvZPypY",
-          tags: [action("Get-Metadata-By-ProfileIds")],
-          data: JSON.stringify({ ProfileIds: [prid] }),
-        })
-        if (!_res3?.Messages?.[0]?.Data) {
-          setInit(_init)
-          return
-        }
-        const profiles = JSON.parse(_res3.Messages[0].Data)
-        const pr = fromPairs(profiles.map(obj => [obj.ProfileId, obj]))[prid]
-        if (pr) {
-          _init = false
-          setActiveStep(3)
-          setProfile(pr)
-          await lf.setItem("profile", pr)
-        }
+        _init = await checkAOProfile(true)
+        setInit(_init)
+        return
       } else if (activeStep === 3) {
         const _res4 = await dryrun({
           process: "XIIKBUWmBoTlZAkK3kD216OwlM50hRj6VKSYB65O9tA",
@@ -780,14 +798,31 @@ export default function Home() {
                     </Text>
                   </CardBody>
                   <CardFooter>
-                    <Link
-                      href="https://vouch-twitter.arweave.dev"
-                      target="_blank"
-                    >
-                      <Button colorScheme="white" variant="outline">
-                        ウォレットアドレスを認証
-                      </Button>
-                    </Link>
+                    <Box>
+                      <Link
+                        href="https://vouch-twitter.arweave.dev"
+                        target="_blank"
+                      >
+                        <Button colorScheme="white" variant="outline">
+                          ウォレットアドレスを認証
+                        </Button>
+                      </Link>
+                      <Flex mt={4} justify="center">
+                        <Box
+                          sx={{
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                            ":hover": { opacity: 0.75 },
+                          }}
+                          onClick={async () => {
+                            setInit(false)
+                            setInit(await checkVouchDAO(true))
+                          }}
+                        >
+                          再チェック
+                        </Box>
+                      </Flex>
+                    </Box>
                   </CardFooter>
                 </Card>
                 <Accordion mt={10} mb={4} allowToggle={true}>
@@ -885,11 +920,28 @@ export default function Home() {
                     <Text>BazAR で AO Profile を作成しましょう。</Text>
                   </CardBody>
                   <CardFooter>
-                    <Link href="https://ao-bazar.arweave.dev" target="_blank">
-                      <Button colorScheme="white" variant="outline">
-                        AO Profile を作成
-                      </Button>
-                    </Link>
+                    <Box>
+                      <Link href="https://ao-bazar.arweave.dev" target="_blank">
+                        <Button colorScheme="white" variant="outline">
+                          AO Profile を作成
+                        </Button>
+                      </Link>
+                      <Flex mt={4} justify="center">
+                        <Box
+                          sx={{
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                            ":hover": { opacity: 0.75 },
+                          }}
+                          onClick={async () => {
+                            setInit(false)
+                            setInit(await checkAOProfile(true))
+                          }}
+                        >
+                          再チェック
+                        </Box>
+                      </Flex>
+                    </Box>
                   </CardFooter>
                 </Card>
                 <Accordion mt={10} mb={4} allowToggle={true}>
