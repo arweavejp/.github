@@ -24,7 +24,6 @@ function App() {
   return (
     <Flex direction="column" w="100%" h="100%" justify="center">
       <Header {...{ addr, balance, setBalance }} />
-
       <Flex align="center" justify="center" flex={1}>
         <Box>
           {mid === null ? (

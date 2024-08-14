@@ -13,12 +13,12 @@ if not campaigns then
    campaigns = { }
 end
 
-if name ~= "Arweave Japan Test" then
-   name = "Arweave Japan Test"
+if name ~= "Arweave Japan" then
+   name = "Arweave Japan"
 end
 
-if ticker ~= "tAJ" then
-   ticker = "tAJ"
+if ticker ~= "AJ" then
+   ticker = "AJ"
 end
 
 if logo ~= "-xO99q2LEMRLj2w5HUkoUVvFfsbx_fCD-mFbaL831W4" then
