@@ -78,6 +78,13 @@ export default async function handler(req, res) {
       kty: "RSA",
       n: _data.publicKey,
     })
-    res.status(200).json({ data: data2, addr, user, referral: _data.referral })
+    const followers = user?.data?.public_metrics?.followers_count ?? 0
+    if (followers < 100) {
+      res.status(200).json({ error: "not enough followers" })
+    } else {
+      res
+        .status(200)
+        .json({ data: data2, addr, user, referral: _data.referral })
+    }
   }
 }

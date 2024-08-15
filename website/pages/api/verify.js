@@ -89,32 +89,36 @@ export default async function handler(req, res) {
     }
     const username = user.data.username
     const id = user.data.id
-    console.log(addr, id, username)
-    let privateJWK = {
-      e: "AQAB",
-      ext: true,
-      kty: "RSA",
-      n: process.env.ARWEAVE_JWK_N,
-      d: process.env.ARWEAVE_JWK_D,
-      p: process.env.ARWEAVE_JWK_P,
-      q: process.env.ARWEAVE_JWK_Q,
-      dp: process.env.ARWEAVE_JWK_DP,
-      dq: process.env.ARWEAVE_JWK_DQ,
-      qi: process.env.ARWEAVE_JWK_QI,
+    const followers = user?.data?.public_metrics?.followers_count ?? 0
+    if (followers < 100) {
+      res.status(200).json({ error: "not enough followers" })
+    } else {
+      let privateJWK = {
+        e: "AQAB",
+        ext: true,
+        kty: "RSA",
+        n: process.env.ARWEAVE_JWK_N,
+        d: process.env.ARWEAVE_JWK_D,
+        p: process.env.ARWEAVE_JWK_P,
+        q: process.env.ARWEAVE_JWK_Q,
+        dp: process.env.ARWEAVE_JWK_DP,
+        dq: process.env.ARWEAVE_JWK_DQ,
+        qi: process.env.ARWEAVE_JWK_QI,
+      }
+      let tags = [
+        action("Verify"),
+        tag("ID", addr),
+        tag("X-ID", id),
+        tag("X-Username", username),
+      ]
+      if (_data.referral) tags.push(tag("Referral", _data.referral))
+      const mid = await message({
+        process: "7iHLISwhaAQhx9lvuKXWix-Q5NM5CnijzEdNsXpn51w",
+        tags,
+        signer: createDataItemSigner(privateJWK),
+      })
+      res.status(200).json({ addr, user: user.data, vouches, profile: pr, mid })
     }
-    let tags = [
-      action("Verify"),
-      tag("ID", addr),
-      tag("X-ID", id),
-      tag("X-Username", username),
-    ]
-    if (_data.referral) tags.push(tag("Referral", _data.referral))
-    const mid = await message({
-      process: "7iHLISwhaAQhx9lvuKXWix-Q5NM5CnijzEdNsXpn51w",
-      tags,
-      signer: createDataItemSigner(privateJWK),
-    })
-    res.status(200).json({ addr, user: user.data, vouches, profile: pr, mid })
   } catch (e) {
     console.log(e)
     res.status(200).json({ error: "something went wrong" })

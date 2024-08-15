@@ -71,8 +71,6 @@ Handlers.add(
       assert(candidates[addr].joined ~= true, "already joined!")
       local vouched = data.Vouchers["Ax_uXyLQBPZSQ15movzv9-O1mDo30khslqN64qD27Z8"]
       assert(type(vouched) == "table", "not vouched!")
-      local value = tonumber(string.match(vouched.Value, "^[^%-]+"))
-      assert(value > 0, "score 0")
       local username = string.lower(vouched.Identifier)
       assert(username == candidates[addr].x_username, "wrong x username!")
       candidates[addr].x = string.lower(vouched.Identifier)

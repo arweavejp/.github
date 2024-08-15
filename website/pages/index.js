@@ -156,7 +156,9 @@ export default function Home() {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ data: data.data, code, state }),
             }).then(r => r.json())
-            if (addr) {
+            if (error && error === "not enough followers") {
+              alert("100 フォロワー以上の X アカウントが必要です。")
+            } else if (addr) {
               if (referral) setRefAddr(referral)
               router.push("/", undefined, { shallow: true })
               if (addr !== _addr) {
@@ -226,13 +228,9 @@ export default function Home() {
       for (const k in vouches.Vouchers) {
         if (k === "Ax_uXyLQBPZSQ15movzv9-O1mDo30khslqN64qD27Z8") {
           const v = vouches.Vouchers[k]
-          if (Number(v.Value.split("-")[0]) > 0) {
-            _init = false
-            setVouched(v)
-            await lf.setItem("vouched", v)
-          } else {
-            alert("Vouch スコアが 0 以上の X アカウントが必要です。")
-          }
+          _init = false
+          setVouched(v)
+          await lf.setItem("vouched", v)
           break
         }
       }
@@ -481,7 +479,7 @@ export default function Home() {
                   </Box>
                   <Box>
                     <Heading size="xs" textTransform="uppercase">
-                      X アカウント | Vouch スコア
+                      X アカウント | 信頼値
                     </Heading>
                     <Text pt="2" fontSize="sm">
                       {vouched ? (
@@ -927,9 +925,7 @@ export default function Home() {
                 <Card align="center" mb={4} mt={10} variant="filled" p={4}>
                   <CardBody>
                     <Text>
-                      VouchDAO
-                      でウォレットアドレスを認証しましょう。フォロワー数が 150
-                      以上の X アカウントが必要です。
+                      VouchDAO でウォレットアドレスを認証しましょう。
                     </Text>
                   </CardBody>
                   <CardFooter>
@@ -1008,7 +1004,7 @@ export default function Home() {
                           flex="1"
                           textAlign="left"
                         >
-                          Vouch スコア
+                          信頼値
                         </Box>
                         <AccordionIcon />
                       </AccordionButton>
@@ -1022,12 +1018,6 @@ export default function Home() {
                         と呼ばれる一定のアルゴリズムでアカウントの信用度を評価した値です。
                       </p>
                       <p>
-                        Arweave Japan
-                        のメンバートークン配布はこの値がゼロより大きいアカウントに限定しています。
-                      </p>
-                      <p>
-                        フォロワー数が 150 以上、総いいねされた数が 20
-                        以上等の条件があるので認証前に
                         <Box
                           color="#B5002C"
                           as="a"
@@ -1036,12 +1026,7 @@ export default function Home() {
                         >
                           こちらでアルゴリズムを確認
                         </Box>
-                        して下さい。
-                      </p>
-                      <p>
-                        現フローでは認証時のスコアを更新できないため、スコアがゼロの
-                        X アカウントを認証するとそのアカウントと紐付けた Arweave
-                        アカウントでトークン受け取りができなくなってしまいます。
+                        できます。
                       </p>
                     </AccordionPanel>
                   </AccordionItem>
@@ -1167,7 +1152,7 @@ export default function Home() {
               <>
                 <Card align="center" mb={4} mt={10} variant="filled" p={4}>
                   <CardBody>
-                    <Text>X にログインして AJ トークンを取得しましょう。</Text>
+                    <Text>X にログインして AJ トークンを取得しましょう。 100 フォロワー以上のアカウントを条件にしています。</Text>
                   </CardBody>
                   <CardFooter>
                     {enc ? (
@@ -1187,7 +1172,11 @@ export default function Home() {
                               signature: to64(signature),
                             }),
                           }).then(r => r.json())
-                          if (res && !res.error) {
+                          if (res?.error === "not enough followers") {
+                            alert(
+                              "100 フォロワー以上の X アカウントが必要です。",
+                            )
+                          } else if (res && !res.error) {
                             await lf.setItem("stats", res)
                             setStats(res)
                             setTimeout(async () => {
