@@ -3,6 +3,7 @@ const { fromPairs, compose, map, splitEvery } = require("ramda")
 const Arweave = require("arweave")
 const { tags, action, tag, verify, decrypt } = require("../../lib/utils")
 const { message, dryrun, createDataItemSigner } = require("@permaweb/aoconnect")
+
 export default async function handler(req, res) {
   try {
     const { signature, data } = req.body
@@ -101,14 +102,16 @@ export default async function handler(req, res) {
       dq: process.env.ARWEAVE_JWK_DQ,
       qi: process.env.ARWEAVE_JWK_QI,
     }
+    let tags = [
+      action("Verify"),
+      tag("ID", addr),
+      tag("X-ID", id),
+      tag("X-Username", username),
+    ]
+    if (_data.referral) tags.push(tag("Referral", _data.referral))
     const mid = await message({
       process: "7iHLISwhaAQhx9lvuKXWix-Q5NM5CnijzEdNsXpn51w",
-      tags: [
-        action("Verify"),
-        tag("ID", addr),
-        tag("X-ID", id),
-        tag("X-Username", username),
-      ],
+      tags,
       signer: createDataItemSigner(privateJWK),
     })
     res.status(200).json({ addr, user: user.data, vouches, profile: pr, mid })

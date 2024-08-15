@@ -5,12 +5,16 @@ balances = balances or { [ao.id] = 1000000000000000 }
 vouchers = vouchers or {}
 campaigns =  campaigns or {}
 
-if name ~= "Test" then
-   name = "Test"
+if name ~= "Arweave Japan" then
+   name = "Arweave Japan"
 end
 
-if ticker ~= "TEST" then
-   ticker = "TEST"
+if ticker ~= "AJ" then
+   ticker = "AJ"
+end
+
+if logo ~= "-xO99q2LEMRLj2w5HUkoUVvFfsbx_fCD-mFbaL831W4" then
+   logo = "-xO99q2LEMRLj2w5HUkoUVvFfsbx_fCD-mFbaL831W4"
 end
 
 if denomination ~= 6 then

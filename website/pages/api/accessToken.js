@@ -78,6 +78,6 @@ export default async function handler(req, res) {
       kty: "RSA",
       n: _data.publicKey,
     })
-    res.status(200).json({ data: data2, addr, user })
+    res.status(200).json({ data: data2, addr, user, referral: _data.referral })
   }
 }

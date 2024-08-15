@@ -4,11 +4,15 @@ const client = new TwitterApi({
   clientId: process.env.X_CLIENT_ID,
   clientSecret: process.env.X_CLIENT_SECRET,
 })
+const { dryrun } = require("@permaweb/aoconnect")
+const { action, tag, getCode } = require("../../lib/utils")
 const { map, compose, splitEvery } = require("ramda")
 const Arweave = require("arweave")
-const validAddress = addr => /^[a-zA-Z0-9_-]{43}$/.test(addr)
+const { validAddress } = require("../../lib/utils")
+const pid = "XIIKBUWmBoTlZAkK3kD216OwlM50hRj6VKSYB65O9tA"
+
 export default async function handler(req, res) {
-  const { publicKey } = req.body
+  const { publicKey, code } = req.body
   const arweave = Arweave.init()
   const addr = await arweave.wallets.jwkToAddress({
     e: "AQAB",
@@ -39,7 +43,27 @@ export default async function handler(req, res) {
       process.env.X_REDIRECT_URL,
       { scope: ["users.read", "tweet.read"] },
     )
-    const json = JSON.stringify({ publicKey, codeVerifier, state })
+    let referral = null
+    if (code) {
+      const [_code, _ref] = code.split(":")
+      const _res = await dryrun({
+        process: pid,
+        tags: [action("Get-Referral-By-Id"), tag("ID", _ref)],
+      })
+      let addr2 = null
+      try {
+        addr2 = JSON.parse(_res?.Messages?.[0]?.Data).address
+      } catch (e) {
+        console.log(e)
+      }
+      let isValid = false
+      if (addr2) {
+        const data = addr2 + ":" + _ref
+        const _code2 = getCode(data)
+        if (_code2 === _code && addr2 !== addr) referral = addr2
+      }
+    }
+    const json = JSON.stringify({ publicKey, codeVerifier, state, referral })
     const _data = compose(
       map(v => new TextEncoder().encode(v)),
       splitEvery(400),

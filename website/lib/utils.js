@@ -1,4 +1,6 @@
 const { map, fromPairs } = require("ramda")
+const md5 = require("md5")
+const crypto = require("crypto")
 
 const decrypt = async data => {
   let privateJWK = {
@@ -67,5 +69,28 @@ const verify = async (signature, data, publicKey) => {
 const action = value => tag("Action", value)
 const tag = (name, value) => ({ name, value })
 const tags = tags => fromPairs(map(v => [v.name, v.value])(tags))
+const getCode = data => {
+  let key = {
+    e: "AQAB",
+    ext: true,
+    kty: "RSA",
+    n: process.env.ARWEAVE_JWK_N,
+    d: process.env.ARWEAVE_JWK_D,
+    p: process.env.ARWEAVE_JWK_P,
+    q: process.env.ARWEAVE_JWK_Q,
+    dp: process.env.ARWEAVE_JWK_DP,
+    dq: process.env.ARWEAVE_JWK_DQ,
+    qi: process.env.ARWEAVE_JWK_QI,
+  }
 
-module.exports = { verify, decrypt, action, tag, tags }
+  const priv = crypto.createPrivateKey({ key, format: "jwk" })
+  const _sign = crypto.createSign("sha256")
+  _sign.update(data)
+  _sign.end()
+  const sign = _sign.sign(priv, "base64")
+  const toURLSafe = str =>
+    str.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
+  return toURLSafe(Buffer.from(md5(sign), "hex").toString("base64"))
+}
+const validAddress = addr => /^[a-zA-Z0-9_-]{43}$/.test(addr)
+module.exports = { verify, decrypt, action, tag, tags, getCode, validAddress }

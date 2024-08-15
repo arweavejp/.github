@@ -1,9 +1,12 @@
 import Head from "next/head"
+import Arweave from "arweave"
 import { useRouter } from "next/router"
 import Link from "next/link"
 import { map, fromPairs } from "ramda"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
+
 import {
+  useToast,
   Accordion,
   AccordionItem,
   AccordionButton,
@@ -34,7 +37,7 @@ import {
   useSteps,
 } from "@chakra-ui/react"
 import { dryrun } from "@permaweb/aoconnect"
-import { action, tag, tags } from "../lib/utils"
+import { validAddress, action, tag, tags } from "../lib/utils"
 import lf from "localforage"
 function to64(buffer) {
   var binary = ""
@@ -55,10 +58,13 @@ const steps = [
 
 export default function Home() {
   const router = useRouter()
+  const toast = useToast()
+  const toastIdRef = useRef()
   const { activeStep, setActiveStep } = useSteps({
     index: 0,
     count: steps.length,
   })
+  const [code, setCode] = useState(null)
   const [init, setInit] = useState(false)
   const [isArconnect, setIsArconnect] = useState(false)
   const [vouched, setVouched] = useState(null)
@@ -69,14 +75,29 @@ export default function Home() {
   const [profile, setProfile] = useState(null)
   const [members, setMembers] = useState({})
   const [memberProfiles, setMemberProfiles] = useState([])
-
+  const [ref, setRef] = useState(null)
+  const [refAddr, setRefAddr] = useState(null)
+  const [refProfile, setRefProfile] = useState(null)
   useEffect(() => {
     if (window.arweaveWallet) setIsArconnect(true)
   }, [])
-
+  useEffect(() => {
+    const _profile = members[refAddr]?.profile
+    if (_profile) {
+      for (const v of memberProfiles) {
+        if (v.ProfileId === _profile) {
+          setRefProfile(v)
+          break
+        }
+      }
+    }
+  }, [memberProfiles, refAddr])
   useEffect(() => {
     ;(async () => {
       try {
+        const url = new URL(location.href)
+        const _ref = url.searchParams.get("ref")
+        if (_ref) setRef(_ref)
         const _addr = await lf.getItem("address")
         let _vouched
         let _profile
@@ -102,6 +123,8 @@ export default function Home() {
                 setInit(true)
                 const _memberProfiles = await lf.getItem("memberProfiles")
                 if (_memberProfiles) setMemberProfiles(_memberProfiles)
+                const _code = await lf.getItem("code")
+                if (_code) setCode(_code)
               }
             }
           }
@@ -109,6 +132,7 @@ export default function Home() {
         setActiveStep(_activeStep)
         const _data = await lf.getItem("encryptedData")
         if (_data) {
+          setRefAddr(_data.referral)
           setAddr(_data.addr)
           setEnc(_data.data)
           const _stats = await lf.getItem("stats")
@@ -117,7 +141,6 @@ export default function Home() {
             if (_stats.profile) setProfile(_stats.profile)
           }
         } else {
-          const url = new URL(location.href)
           const code = url.searchParams.get("code")
           const state = url.searchParams.get("state")
           const data = await lf.getItem(`verifier`)
@@ -127,12 +150,14 @@ export default function Home() {
               data: data2,
               addr,
               user,
+              referral,
             } = await fetch(`/api/accessToken`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ data: data.data, code, state }),
             }).then(r => r.json())
             if (addr) {
+              if (referral) setRefAddr(referral)
               router.push("/", undefined, { shallow: true })
               if (addr !== _addr) {
                 alert("ウォレットアドレスが違います。")
@@ -146,7 +171,7 @@ export default function Home() {
                 alert("X アカウントが違います。")
                 return
               }
-              await lf.setItem("encryptedData", { addr, data: data2 })
+              await lf.setItem("encryptedData", { addr, data: data2, referral })
               setEnc(data2)
             }
           }
@@ -270,12 +295,11 @@ export default function Home() {
           tags: [action("Members")],
         })
         try {
-          const member = JSON.parse(_res4?.Messages?.[0]?.Data)?.[addr]
-          if (member) {
-            setActiveStep(4)
-            setMembers(JSON.parse(_res4?.Messages?.[0]?.Data))
-            await lf.setItem("members", JSON.parse(_res4?.Messages?.[0]?.Data))
-          }
+          const members = JSON.parse(_res4?.Messages?.[0]?.Data)
+          setMembers(members)
+          await lf.setItem("members", members)
+          const member = members[addr]
+          if (member) setActiveStep(4)
         } catch (e) {}
       }
       setInit(_init)
@@ -338,6 +362,8 @@ export default function Home() {
                   setEnc(null)
                   setStats(null)
                   setActiveStep(0)
+                  setCode(null)
+                  await lf.removeItem("code")
                   await lf.removeItem("verifier")
                   await lf.removeItem("stats")
                   await lf.removeItem("encryptedData")
@@ -493,6 +519,21 @@ export default function Home() {
                       )}
                     </Text>
                   </Box>
+                  {!refAddr || refAddr === addr || !refProfile ? null : (
+                    <Box>
+                      <Heading size="xs" textTransform="uppercase">
+                        リファラル
+                      </Heading>
+                      <Link
+                        href={`https://ao-bazar.arweave.dev/#/profile/${refProfile.ProfileId}/assets/`}
+                        target="_blank"
+                      >
+                        <Text pt="2" fontSize="sm" color="#B5002C">
+                          {refProfile.DisplayName}
+                        </Text>
+                      </Link>
+                    </Box>
+                  )}
                 </Stack>
               </CardBody>
             </Card>
@@ -519,7 +560,11 @@ export default function Home() {
             {!init || activeStep !== 4 ? null : stats ? (
               <Card align="center" mb={4} mt={10} variant="filled" p={4}>
                 <CardBody>
-                  <Text>
+                  <Text
+                    color="#B5002C"
+                    fontWeight="bold"
+                    sx={{ textDecoration: "underline" }}
+                  >
                     おめでとうございます！200 AJ トークンが付与されました！
                   </Text>
                 </CardBody>
@@ -537,8 +582,98 @@ export default function Home() {
             ) : (
               <Card align="center" mb={4} mt={10} variant="filled" p={4}>
                 <CardBody>
-                  <Text>あなたは Arweave Japan のメンバーです！</Text>
+                  <Text
+                    mb={2}
+                    color="#B5002C"
+                    fontWeight="bold"
+                    sx={{ textDecoration: "underline" }}
+                  >
+                    あなたは Arweave Japan のメンバーです！
+                  </Text>
                 </CardBody>
+                <Text>
+                  リファラルリンクを使うと１名紹介につき 10 AJ 獲得できます。
+                </Text>
+                <CardFooter>
+                  {code ? (
+                    <Button
+                      fontWeight="normal"
+                      onClick={() => {
+                        function copyToClipboard(text) {
+                          if (
+                            navigator.clipboard &&
+                            navigator.clipboard.writeText
+                          ) {
+                            navigator.clipboard
+                              .writeText(text)
+                              .then(() => {
+                                console.log(
+                                  "Text successfully copied to clipboard!",
+                                )
+                              })
+                              .catch(err => {
+                                console.error("Failed to copy text: ", err)
+                              })
+                          } else {
+                            console.error("Clipboard API not supported!")
+                          }
+                        }
+                        copyToClipboard(`https://arweave.jp/?ref=${code}`)
+                        toastIdRef.current = toast({
+                          description: "リンクをコピーしました",
+                          status: "warning",
+                        })
+                      }}
+                    >
+                      <Flex>
+                        https://arweave.jp/?ref={code}
+                        <Box
+                          fontSize="14px"
+                          ml={3}
+                          as="i"
+                          className="far fa-copy"
+                        />
+                      </Flex>
+                    </Button>
+                  ) : (
+                    <Button
+                      colorScheme="white"
+                      variant="outline"
+                      onClick={async () => {
+                        await window.arweaveWallet.connect([
+                          "SIGNATURE",
+                          "ACCESS_PUBLIC_KEY",
+                        ])
+                        const arweave = Arweave.init()
+                        const pub =
+                          await window.arweaveWallet.getActivePublicKey()
+                        const addr = await arweave.wallets.jwkToAddress({
+                          e: "AQAB",
+                          ext: true,
+                          kty: "RSA",
+                          n: pub,
+                        })
+                        const _data = new TextEncoder().encode(addr)
+                        const signature =
+                          await window.arweaveWallet.signMessage(_data)
+                        const res = await fetch(`/api/getReferralCode`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            publicKey: pub,
+                            signature: to64(signature),
+                          }),
+                        }).then(r => r.json())
+                        if (res.code) {
+                          setCode(res.code)
+                          await lf.setItem("code", res.code)
+                        }
+                      }}
+                    >
+                      リファラルリンク取得
+                    </Button>
+                  )}
+                </CardFooter>
               </Card>
             )}
             {!init || activeStep !== 4 ? null : (
@@ -1089,7 +1224,7 @@ export default function Home() {
                           const { url, data } = await fetch(`/api/x`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ publicKey }),
+                            body: JSON.stringify({ publicKey, code: ref }),
                           }).then(r => r.json())
                           if (url) {
                             await lf.setItem(`verifier`, { url, data })
