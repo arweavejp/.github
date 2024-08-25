@@ -177,6 +177,13 @@ await saveSVG(ao, jwk)
 
 ### GraphQL でトランザクションを取得
 
+Arweave の最大の強みは、データと共に任意のタグをトランザクションに指定して無数にある分散型ゲートウェイから GraphQL で柔軟に検索可能にできることです。この仕組みを活用するとあらゆる分散型アプリケーションの構築が可能になります。 ハイパー並列コンピュータ AO もこの仕組みをフル活用したプロトコルです。保存されるデータとタグは Arweave でマイニングされる前に、ゲートウェイのキャッシュで即座にアクセス可能になります。究極に速くて便利なプレコンファメーションな仕組みです。
+
+### 参照
+
+- [Arweave のトランザクションタグについて](https://cookbook.arweave.dev/concepts/tags.html)
+- [Arweave GraphQL ガイド](https://gql-guide.vercel.app/)
+
 ```javascript
 const q = txid => `query {
     transactions(ids: ["${txid}"]) {
@@ -199,18 +206,23 @@ const getTx = async txid => {
 
 ### データを取得
 
+アップロードされたデータを取得する方法は二つあります。`arweave.js` の `getData` を使うか無数の分散型ゲートウェイから `http` リクエストで取得するかです。画像をアップロードして `https://arweave.net/[txid]`から即座に参照する等ができます。
+
 ```javascript
 const data = await arweave.transactions.getData(
     txid, 
     { decode: true, string: true}
 )
 ```
+
 ```javascript
 const data = await fetch(`http://localhost:4000/${txid}`).then((r)=> r.text())
 ```
 
 
 ### トランザクションをネストしてバンドル
+
+Arweave にはメタデータとして任意のタグとデータそのものを保存できますが、更に真価を発揮するのが [ANS-104 Bundled Data v2.0](https://github.com/ArweaveTeam/arweave-standards/blob/master/ans/ANS-104.md) 規格によってデータの部分にバイナリフォーマットでトランザクションを無限にネストできる仕組みです。１トランザクションに１００万トランザクションをネストして送ることもできます。このネストの仕組みで Arweave は無制限にスケールすることができます。バンドルフォーマットの作成には `arbundles` を使います。
 
 ```bash
 npm i arbundles
@@ -233,6 +245,8 @@ const bundle = async (_items, jwk) => {
 }
 ```
 
+例えば、先に上げたマークダウンファイルと SVG 画像ファイルをバンドルして一緒にアップロードしてみます。
+
 ```javascript
 const { items } = await bundle(
   [
@@ -242,6 +256,8 @@ const { items } = await bundle(
   jwk
 )
 ```
+
+次のセクションで取り扱う、 `AO` は `ANS-104` フォーマットのフル活用です。
 
 ## AOS
 
