@@ -48,11 +48,17 @@ cd ../wallets && node printWalletAddresses.mjs
 npm i arweave
 ```
 
+デフォルトがローカル環境のポート `80` 設定になっているので `port` だけ `4000` に指定します。
+
 ```javascript
 const arweave = require("arweave").init({ port: 4000 })
 ```
 
+- 参照 : [arweave-js](https://github.com/ArweaveTeam/arweave-js)
+
 ### Arweave ウォレットの作成
+
+Arweave アカウントには RSA が使われていてアドレスは公開鍵の SHA-256 ハッシュで 43 文字です。JWK　形式で生成されたものを使うのが一般的です。
 
 ```javascript
 const addr = async jwk => arweave.wallets.jwkToAddress(jwk)
@@ -63,7 +69,29 @@ const gen = async () => {
 }
 ```
 
+```javascript
+const {jwk, addr} = await gen()
+```
+
+JWK は以下のフォーマットで生成されますが、基本的に `n` が公開鍵、 `d` が秘密鍵で `Web Crypto API` 等と組み合わせて署名や暗号化等、様々な用途に使うこともできます。他のフィールド（ `p` `q` `dp` `dq` `qi` ）は暗号処理を高速化させるためのパラメータです。
+
+```json
+{
+  "kty":"RSA",
+  "n":"o1kvT...",
+  "e":"AQAB",
+  "d":"Ohpdn...",
+  "p":"ymLt9...",
+  "q":"zp7X_...",
+  "dp":"pyN6W...",
+  "dq":"wkpHn....",
+  "qi":"Zvbxf..."
+}
+```
+
 ### AR トークンをミント （ArLocal 限定）
+
+ローカル環境の `ArLocal` に限り AR トークンを無制限にミントできます。また、 Arweave メインネットは分散化されたマイナーに自動でマイニングされますが、ローカルノードの場合主導で `/mine` API を呼び出す必要があります。 `/mine` をして始めて、 [`Scar` エクスプローラ](http://localhost:4006)に反映されます。
 
 ```javascript
 const mine = async () => await arweave.api.get(`/mine`)
@@ -77,6 +105,11 @@ const mint = async (addr, amount = "1.0") => {
   await mine()
   return await bal(addr)
 }
+```
+
+```javascript
+const {jwk, addr} = await gen()
+const balance = await mint(addr, "10.0")
 ```
 
 ### AR トークンを送金
