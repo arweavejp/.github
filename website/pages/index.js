@@ -299,6 +299,16 @@ export default function Home() {
           const member = members[addr]
           if (member) setActiveStep(4)
         } catch (e) {}
+      } else if (activeStep === 4) {
+        const _res4 = await dryrun({
+          process: "XIIKBUWmBoTlZAkK3kD216OwlM50hRj6VKSYB65O9tA",
+          tags: [action("Members")],
+        })
+        try {
+          const members = JSON.parse(_res4?.Messages?.[0]?.Data)
+          setMembers(members)
+          await lf.setItem("members", members)
+        } catch (e) {}
       }
       setInit(_init)
     })()
@@ -777,6 +787,7 @@ export default function Home() {
                         >
                           <Image
                             m={2}
+                            sx={{ borderRadius: "50%" }}
                             title={v.DisplayName}
                             src={
                               !v.ProfileImage || v.ProfileImage === "None"
@@ -924,9 +935,7 @@ export default function Home() {
               <>
                 <Card align="center" mb={4} mt={10} variant="filled" p={4}>
                   <CardBody>
-                    <Text>
-                      VouchDAO でウォレットアドレスを認証しましょう。
-                    </Text>
+                    <Text>VouchDAO でウォレットアドレスを認証しましょう。</Text>
                   </CardBody>
                   <CardFooter>
                     <Box>
@@ -1152,7 +1161,10 @@ export default function Home() {
               <>
                 <Card align="center" mb={4} mt={10} variant="filled" p={4}>
                   <CardBody>
-                    <Text>X にログインして AJ トークンを取得しましょう。 100 フォロワー以上のアカウントを条件にしています。</Text>
+                    <Text>
+                      X にログインして AJ トークンを取得しましょう。 100
+                      フォロワー以上のアカウントを条件にしています。
+                    </Text>
                   </CardBody>
                   <CardFooter>
                     {enc ? (
