@@ -92,7 +92,7 @@ JWK は以下のフォーマットで生成されますが、基本的に `n` �
 
 ### AR トークンをミント （ArLocal 限定）
 
-ローカル環境の `ArLocal` に限り AR トークンを無制限にミントできます。また、 Arweave メインネットは分散化されたマイナーに自動でマイニングされますが、ローカルノードの場合主導で `/mine` API を呼び出す必要があります。 `/mine` をして始めて、 [`Scar` エクスプローラ](http://localhost:4006)に反映されます。
+ローカル環境の `ArLocal` に限り AR トークンを無制限にミントできます。また、 Arweave メインネットは分散化されたマイナーに自動でマイニングされますが、ローカルノードの場合手動で `/mine` API を呼び出す必要があります。 `/mine` をして始めて、 [`Scar` エクスプローラ](http://localhost:4006)に反映されます。
 
 ```javascript
 const mine = async () => await arweave.api.get(`/mine`)
@@ -146,25 +146,21 @@ await transfer(jwk, addr2, "0.5")
 
 ```javascript
 const saveMD = async (md, jwk) => {
-  let tx = await arweave.createTransaction({
-    data: md,
-  })
+  let tx = await arweave.createTransaction({ data: md })
   tx.addTag("Content-Type", "text/markdown")
   return await postTx(tx, jwk)
 }
 ```
 
 ```javascript
-await saveMD("# This is Markdown", jwk)
+const txid = await saveMD("# This is Markdown", jwk)
 ```
 
 ### 画像データを保存
 
 ```javascript
 const saveSVG = async (svg, jwk) => {
-  let tx = await arweave.createTransaction({
-    data: Buffer.from(svg, "base64"),
-  })
+  let tx = await arweave.createTransaction({ data: Buffer.from(svg, "base64") })
   tx.addTag("Content-Type", "image/svg+xml")
   return await postTx(tx, jwk)
 }
@@ -173,12 +169,12 @@ const saveSVG = async (svg, jwk) => {
 
 ```javascript
 const ao = "PHN2ZyB3aWR0aD0iNDI5IiBoZWlnaHQ9IjIxNCIgdmlld0JveD0iMCAwIDQyOSAyMTQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0wIDIxNEg3MS4zNzYzTDg1Ljk0MjkgMTc0LjYxTDUzLjE2ODEgMTA3LjVMMCAyMTRaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBkPSJNMTg5LjM2NiAxNjAuNzVMMTA5Ljk3OCAxTDg1Ljk0MjkgNTUuNzA4OUwxNjAuOTYxIDIxNEgyMTVMMTg5LjM2NiAxNjAuNzVaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMyMiAyMTRDMzgxLjA5NCAyMTQgNDI5IDE2Ni4wOTQgNDI5IDEwN0M0MjkgNDcuOTA1NSAzODEuMDk0IDAgMzIyIDBDMjYyLjkwNiAwIDIxNSA0Ny45MDU1IDIxNSAxMDdDMjE1IDE2Ni4wOTQgMjYyLjkwNiAyMTQgMzIyIDIxNFpNMzIyIDE3MkMzNTcuODk5IDE3MiAzODcgMTQyLjg5OSAzODcgMTA3QzM4NyA3MS4xMDE1IDM1Ny44OTkgNDIgMzIyIDQyQzI4Ni4xMDEgNDIgMjU3IDcxLjEwMTUgMjU3IDEwN0MyNTcgMTQyLjg5OSAyODYuMTAxIDE3MiAzMjIgMTcyWiIgZmlsbD0iYmxhY2siLz4KPC9zdmc+Cg=="
-await saveSVG(ao, jwk)
+const txid = await saveSVG(ao, jwk)
 ```
 
 ### GraphQL でトランザクションを取得
 
-Arweave の最大の強みは、データと共に任意のタグをトランザクションに指定して無数にある分散型ゲートウェイから GraphQL で柔軟に検索可能にできることです。この仕組みを活用するとあらゆる分散型アプリケーションの構築が可能になります。 ハイパー並列コンピュータ AO もこの仕組みをフル活用したプロトコルです。保存されるデータとタグは Arweave でマイニングされる前に、ゲートウェイのキャッシュで即座にアクセス可能になります。究極に速くて便利なプレコンファメーションな仕組みです。
+Arweave の最大の強みは、データと共に任意のタグをトランザクションに指定して無数にある分散型ゲートウェイから GraphQL で柔軟に検索可能にできることです。この仕組みを活用するとあらゆる分散型アプリケーションの構築が可能になります。 ハイパー並列コンピュータ AO もこの仕組みをフル活用したプロトコルです。保存されるデータとタグは Arweave でマイニングされる前に、ゲートウェイのキャッシュで即座にアクセス可能になります。究極に速くて便利なプレコンファメーションの仕組みです。
 
 ### 参照
 
@@ -207,7 +203,7 @@ const getTx = async txid => {
 
 ### データを取得
 
-アップロードされたデータを取得する方法は二つあります。`arweave.js` の `getData` を使うか無数の分散型ゲートウェイから `http` リクエストで取得するかです。画像をアップロードして `https://arweave.net/[txid]`から即座に参照する等ができます。
+アップロードされたデータを取得する方法は二つあります。`arweave.js` の `getData` を使うか無数の分散型ゲートウェイから `http` リクエストで取得するかです。例えば、画像をアップロードして `https://arweave.net/[txid]`から即座に参照するアプリケーションを作ること等ができます。
 
 ```javascript
 const data = await arweave.transactions.getData(
@@ -235,7 +231,7 @@ const { ArweaveSigner, bundleAndSignData, createData } = require("arbundles")
 const bundle = async (_items, jwk) => {
   const signer = new ArweaveSigner(jwk)
   const items = _items.map(v => {
-    let tags = {}
+    let tags = []
     for (const k in v[1] && {}) tags.push({ name: k, value: v[1][k] })
     return createData(v[0], signer, { tags })
   })
@@ -246,7 +242,7 @@ const bundle = async (_items, jwk) => {
 }
 ```
 
-例えば、先に上げたマークダウンファイルと SVG 画像ファイルをバンドルして一緒にアップロードしてみます。
+例えば、先に挙げたマークダウンファイルと SVG 画像ファイルをバンドルして一緒にアップロードしてみます。
 
 ```javascript
 const { items } = await bundle(
@@ -257,7 +253,7 @@ const { items } = await bundle(
   jwk
 )
 ```
-ネストしたトランザクションのデータ部分に更に無数のトランザクションをネストできます。ネストしたトランザクションやデータも、GraphQL やゲートウェイから即座に参照可能になります。次のセクションで取り扱う、 `AO` は `ANS-104` フォーマットのフル活用です。
+ネストしたトランザクションのデータ部分に更に無数のトランザクションをネストできます。ネストしたトランザクションやデータも、GraphQL や分散型ゲートウェイから即座に参照可能になります。次のセクションで取り扱う、 `AO` は `ANS-104` フォーマットのフル活用事例です。
 
 ## AOS
 
@@ -265,11 +261,13 @@ const { items } = await bundle(
 
 AO は 上記した Arweave の `ANS-104` 規格をフル活用した、無制限に水平スケール可能な分散型スーパーコンピュータです。３つのユニット（ MU / SU / CU ）がそれぞれ分散化されて疎結合され、Ethereum のレイヤー１のリステーキングや AR トークンの保有によって発行される AO トークンによってセキュリティが担保されます。AO は単に非同期メッセージの共通フォーマットを定義したもので、その実装方法は定義されていません。 AOS は Lua 言語をベースとした AO 上の最初の VM 実装です。
 
-- 参照 : [AO スペック](https://ao.arweave.dev/#/read)
+AO の Lua ベース VM である AOS は、コマンドライン REPL から便利に使うこともできますが、ここでは `aoconnect` を使ってプログラマブルなアプローチをします。
 
-AO の Lua ベースの VM である AOS は、コマンドライン REPL から便利に使うこともできますが、ここでは `aoconnect` を使ってプログラマブルなアプローチをします。
-
-- 参照 : [aoconnect](https://cookbook_ao.g8way.io/guides/aoconnect/aoconnect.html)
+#### 
+- 
+- [AO スペック](https://ao.arweave.dev/#/read)
+- [AO クックブック](https://cookbook_ao.g8way.io/)
+- [aoconnect](https://cookbook_ao.g8way.io/guides/aoconnect/aoconnect.html)
 
 ### ユニットに接続
 
@@ -298,9 +296,9 @@ const { result, message, spawn, dryrun } = require("@permaweb/aoconnect")
 
 ### AOS プロセスを spawn
 
-AO の仕組みを簡潔に説明すると、まずバイナリ形式の Wasm モジュールを Arwaeve に保存します。そして各プロセスが Wasm モジュールをインスタンス化して 4GB (Wasm32) または、 16GB (Wasm64) のメモリを持つことができます。プロセスにユーザーや別のプロセスが非同期にメッセージを送りそれがモジュールにインプットされてメモリを更新していきます。各プロセスから任意の `message` や別のプロセスを `spawn` したり、 `cron` を使って定期的にメッセージを生成することで完全に `Autonomous` な スマートコントラクト を動かすことができます。また、拡張機能を使って LLM の推論をオンチェーンに載せて Autonomous な AI を動かすこともできます。
+AO の仕組みを簡潔に説明すると、まずバイナリ形式の Wasm モジュールを Arwaeve に保存します。そして各プロセスが Wasm モジュールをインスタンス化して 4GB (Wasm32) または、 16GB (Wasm64) のメモリを持つことができます。プロセスにユーザーや別のプロセスが非同期にメッセージを送りそれがモジュールにインプットされて Wasm メモリ （スマートコントラクトのステート） を更新 していきます。各プロセスから任意の `message` や別のプロセスを `spawn` したり、 `cron` を使って定期的にメッセージを生成することで完全に `Autonomous` な スマートコントラクト を動かすことができます。また、拡張機能を使って LLM の推論をオンチェーンに載せて Autonomous な AI を動かすこともできます。
 
-ローカル環境立ち上げ時にメモした Module のトランザクション ID と　スケジューラウォレットを指定して、AOS モジュールをインスタンス化したプロセスを立ち上げましょう。
+ローカル環境立ち上げ時にメモした Module のトランザクション ID と　スケジューラウォレットを指定して、AOS モジュールをインスタンス化したプロセスを立ち上げましょう。プロセスを spawn 後に、MU がメッセージを SU にリレーして SU が Arweave に保存するラグがあるので１秒ほど待ってからトランザクションにアクセスします。
 
 ```javascript
 const wait = ms => new Promise(res => setTimeout(() => res(), ms))
@@ -341,8 +339,6 @@ Handlers.add(
    function (msg)
       assert(type(msg.Key) == 'string', 'Key is required!')
       assert(type(msg.Value) == 'string', 'Value is required!')
-      ao.log("what the hell")
-      ao.log("is going on")
       Store[msg.Key] = msg.Value
       Handlers.utils.reply("Value stored!")(msg)
    end
@@ -369,7 +365,7 @@ const res = await result({ process: pid, message: mid })
 console.log(res)
 ```
 
-追加したハンドラーを使ってみます。書き込みをする際は `message` を使いますが、読み取りだけの場合は `dryrun` を使います。この場合、Arweave にメッセージが保存せずに現状の状態だけを取得することができます。読み取りを `message` で記録することも可能ですが、これはプロセス同士がある瞬間の状態の記録を取って参照する場合等に使います。
+追加したハンドラーを使ってみます。書き込みをする際は `message` を使いますが、読み取りだけの場合は `dryrun` を使います。この場合、Arweave にメッセージが保存せずに現状の状態だけを取得することができます。読み取りを `message` であえて記録することも可能ですが、これはプロセス同士がある瞬間の状態の記録を取って参照する場合等に使えます。
 
 ```javascript
 const mid1 = await message({
@@ -382,7 +378,7 @@ const mid1 = await message({
   ],
 })
 const res1 = await result({ process: pid, message: mid1 })
-console.log(res1)
+console.log(res1.Messages[0])
 
 const res2 = await dryrun({
   process: pid,
@@ -401,7 +397,7 @@ console.log(res2.Messages[0].Tags)
 
 ## 独自VMの開発
 
-AO　プロセスの処理は CU (コンピュートユニット)が行っていますが、 AOS モジュールは AO の実装の一例に過ぎず、[ao-loader](https://github.com/permaweb/ao/tree/main/loader) に準拠する独自のモジュールを Lua や他の言語で開発することも可能ですし、実はモジュールが Wasm である必要もありません。CU はあるメッセージの実行結果を要求されると、まずそのプロセスからモジュールアドレスを特定し、モジュールメッセージから読み取れるプロセスのメタ情報等から Wasm のロード方法を判別し `ao-loader` を使ってプロセスの計算を実行します。AOS の Wasm モジュールは [ao CLI](https://github.com/permaweb/ao/tree/main/dev-cli) で Lua をコンパイル可能ですが、モジュールを ao-loader に互換性のない非 Wasm で書き換えても、それ専用のローダーを作ればよいのです。ここでは、簡単な Javascript のモジュールとそれに付随する CU / MU を開発してみます。SU は AOS のものをそのまま使います。SU はメッセージを並べて Arweave にアップロードする役割を担うだけなので、モジュールによって実装を変更する必要がありません。
+AO　プロセスの処理は CU (コンピュートユニット) が行っていますが、 AOS モジュールは AO の実装の一例に過ぎず、[ao-loader](https://github.com/permaweb/ao/tree/main/loader) に準拠する独自のモジュールを Lua や他の言語で開発することも可能ですし、実はモジュールが Wasm である必要もありません。CU はあるメッセージの実行結果を要求されると、まずそのプロセスの使っているモジュールアドレスを特定し、モジュールメッセージのタグから読み取れるメタ情報等から Wasm のロード方法を判別し `ao-loader` を使ってプロセスの計算を実行します。AOS の Wasm モジュールは [ao CLI](https://github.com/permaweb/ao/tree/main/dev-cli) で Lua をコンパイルして作成可能ですが、モジュールを ao-loader に互換性のない非 Wasm で書き換えても、それ専用のローダーを作ればよいのです。ここでは、実装のヒントとして簡単な Javascript のモジュールとそれに付随する CU / MU を開発してみます。SU は AOS のものをそのまま使います。SU はメッセージを並べて Arweave にアップロードするシーケンサの役割を担うだけなので、モジュールによって実装を変更する必要がありません。
 
 ```bash
 npm i express body-parser @permaweb/ao-scheduler-utils
@@ -409,7 +405,7 @@ npm i express body-parser @permaweb/ao-scheduler-utils
 
 ## Messenger Unit
 
-メッセンジャーユニットの役割は、ユーザーから受け取ったバイナリメッセージを正当なものか判別して、 [ao-scheduler-utils](https://github.com/permaweb/ao/tree/main/scheduler-utils) を使ってプロセスを担当している SU の URL を特定しメッセージを横流しします。他にも CU の Result から発信されたメッセージを SU にルーティングする等の役割がありますが、ここではそれが発生しないモジュールを作ります。
+メッセンジャーユニットの役割は、ユーザーから受け取ったバイナリメッセージを正当なものか判別して、 [ao-scheduler-utils](https://github.com/permaweb/ao/tree/main/scheduler-utils) を使ってそのプロセスを担当している SU の URL を特定しメッセージを横流しします。他にも CU の 計算結果 から spawn されたメッセージを SU にルーティングする等の役割がありますが、ここではそれが発生しないシンプルなモジュールを作ります。
 
 ```javascript
 const express = require("express")
@@ -454,9 +450,7 @@ app.post("/", async (req, res) => {
   try {
     const json = await fetch(_url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/octet-stream",
-      },
+      headers: { "Content-Type": "application/octet-stream" },
       body: binary,
     }).then(response => response.json())
     console.log(json)
@@ -519,6 +513,7 @@ let modules = {}
 app.get("/result/:mid", async (req, res) => {
   const { ["process-id"]: pid } = req.query
   const { mid } = req.params
+  
   const json = await fetch("http://localhost:4000/graphql", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -563,20 +558,16 @@ node cu.js
 
 ### Javascript Module を登録
 
-モジュールは Javascript の `handle` 関数で定義して、第一パラメータ（ステート）に第二パラメータを足して返信するだけのシンプルなロジックにします。これを AO のモジュールメッセージのスペックに準拠して `Module-Format` を `js-unknown-unknown` に変更してアップロードします。このモジュールフォーマットを検知した CU が先に定義したシンプルなローダーを使って遅延計算します。AO のメッセージスペックとは完全に準拠しているので AOS 等他のプロセスとインターオペラビリティを持ってメッセージの交換ができます。この様に、 AO はメッセージフォーマットをスペックとして定義しているだけで実装言語や技術スタックは自由なのです。 Ethereum や Solana の VM を AO に載っけることも可能です。
+モジュールは Javascript の `handle` 関数で定義して、第一パラメータ （ステート） に第二パラメータを足して返信するだけのシンプルなロジックにします。これを AO のモジュールメッセージのスペックに準拠して `Module-Format` を `js-unknown-unknown` に変更してアップロードします。このモジュールフォーマットを検知した CU が先に定義したシンプルなローダーを使って遅延計算します。AO のメッセージスペックには完全に準拠しているので AOS 等他のプロセスとインターオペラビリティを持ってメッセージの交換ができます。この様に、 AO はメッセージフォーマットをスペックとして定義しているだけで実装言語や技術スタックは自由なのです。 工夫すれば Ethereum や Solana の VM を AO に載っけることも可能です。`Content-Type` は AO のスペック外ですがゲートウェイからのファイルアクセスの利便性のため指定しておきます。
 
 ```javascript
+const arweave = require("arweave").init({ port: 4000 })
+
 const js = `
 function handle(count, num) {
   return count + num;
 }`
 
-const { result, results, message, spawn, monitor, unmonitor, dryrun } =
-  connect({
-    MU_URL: "http://localhost:3000",
-    CU_URL: "http://localhost:3001",
-    GATEWAY_URL: "http://localhost:4000",
-  })
 const { addr: addr1, jwk } = await gen()
 const balance = await mint(addr1)
 
@@ -587,13 +578,14 @@ tx.addTag("Type", "Module")
 tx.addTag("Module-Format", "js-unknown-unknown")
 tx.addTag("Input-Encoding", "JSON-V1")
 tx.addTag("Output-Encoding", "JSON-V1")
+tx.addTag("Content-Type", "text/javascript")
 const module_txid = await postTx(tx, jwk)
 await wait(1000)
 ```
 
 ### Scheduler URL を登録
 
-プロセスを `spawn` する前に、 `Scheduler-Location` メッセージを使ってスケジューラアドレスに SU の URL を登録する必要があります。 MU と CU はこの情報を使って `ao-scheduler-utils` 等でプロセスのスケジューラを特定します。`Scheduler-Location` を署名する `jwk` のアドレスが URL の管理アドレスになります。これは DNS のように機能します。
+プロセスを `spawn` する前に、 `Scheduler-Location` メッセージを使ってスケジューラアドレスに SU の URL を登録する必要があります。 MU と CU はこの情報を使って `ao-scheduler-utils` 等でプロセスのスケジューラを特定します。`Scheduler-Location` を署名する `jwk` のアドレスが URL の管理アドレスになります。これは DNS のように機能します。先に説明したように Arweave のトランザクションにはトークンの送金かデータのアップロードが必須なので、適当に `1984` と指定します。
 
 ```javascript
 let tx = await arweave.createTransaction({ data: "1984" })
@@ -611,6 +603,13 @@ await wait(1000)
 モジュールのトランザクション ID とスケジューラの管理アドレスを指定してプロセスを立ち上げるメッセージを `aoconnect`で `spawn` します。
 
 ```javascript
+const { createDataItemSigner, connect } = require("@permaweb/aoconnect")
+const { result, message, spawn, dryrun } = connect({
+  MU_URL: "http://localhost:3000",
+  CU_URL: "http://localhost:3001",
+  GATEWAY_URL: "http://localhost:4000",
+})
+
 const pid = await spawn({
   module: module_txid,
   scheduler: addr,
