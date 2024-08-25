@@ -401,7 +401,7 @@ console.log(res2.Messages[0].Tags)
 
 ## 独自VMの開発
 
-AO　プロセスの処理は CU (コンピュートユニット)が行っていますが、 AOS モジュールは AO の実装の一例に過ぎず、独自のモジュールを開発することも可能ですし、実はモジュールが Wasm である必要もありません。CU はあるメッセージの実行結果を要求されると、まずそのプロセスからモジュールアドレスを特定し、モジュールメッセージから読み取れるプロセスのメタ情報等から Wasm のロード方法を判別し [ao-loader](https://github.com/permaweb/ao/tree/main/loader) を使ってプロセスの計算を実行します。AOS の Wasm モジュールは [ao CLI](https://github.com/permaweb/ao/tree/main/dev-cli) で Lua をコンパイル可能ですが、モジュールを ao-loader に互換性のない非 Wasm で書き換えても、それ専用のローダーを作ればよいのです。ここでは、簡単な Javascript のモジュールとそれに付随する CU / MU を開発してみます。SU は AOS のものをそのまま使います。SU はメッセージを並べて Arweave にアップロードする役割を担うだけなので、モジュールによって実装を変更する必要がありません。
+AO　プロセスの処理は CU (コンピュートユニット)が行っていますが、 AOS モジュールは AO の実装の一例に過ぎず、[ao-loader](https://github.com/permaweb/ao/tree/main/loader) に準拠する独自のモジュールを Lua や他の言語で開発することも可能ですし、実はモジュールが Wasm である必要もありません。CU はあるメッセージの実行結果を要求されると、まずそのプロセスからモジュールアドレスを特定し、モジュールメッセージから読み取れるプロセスのメタ情報等から Wasm のロード方法を判別し `ao-loader` を使ってプロセスの計算を実行します。AOS の Wasm モジュールは [ao CLI](https://github.com/permaweb/ao/tree/main/dev-cli) で Lua をコンパイル可能ですが、モジュールを ao-loader に互換性のない非 Wasm で書き換えても、それ専用のローダーを作ればよいのです。ここでは、簡単な Javascript のモジュールとそれに付随する CU / MU を開発してみます。SU は AOS のものをそのまま使います。SU はメッセージを並べて Arweave にアップロードする役割を担うだけなので、モジュールによって実装を変更する必要がありません。
 
 ```bash
 npm i express body-parser @permaweb/ao-scheduler-utils
