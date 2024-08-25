@@ -16,7 +16,7 @@ Arweave Japan は [Arweave](https://arweave.org/) / [AO](https://ao.arweave.dev/
 以下の大まかなスケジュールを通じて日本からグローバルで最低１０の AO トッププロジェクト輩出を目指します。
 
 - [Hyper Parallel 東京イベント](https://lu.ma/9k7uzemx) | Arweave Japan キックオフ （2024年7月27日）
-- AO ブートキャンプ （2024年8月）
+- [AO ブートキャンプ](https://lu.ma/w45bzjix) （2024年8月）
 - AO ハッカソン （2024年9月）
 - Arweave 公式日本カンファレンス （2025年春）
 
@@ -24,6 +24,7 @@ Arweave Japan は [Arweave](https://arweave.org/) / [AO](https://ao.arweave.dev/
 
 - [Arweave / AO リソースまとめ](../docs/resources.md)
 - [Arweave / AO 開発入門](../docs/quick-start.md)
+- [AO ブートキャンプ Vol.01](../docs/bootcamp/vol_01.md)
 
 ## エコシステムパートナー募集
 
@@ -39,5 +40,5 @@ Arweave Japan は Arweave / AO での開発に興味関心をお持ちのエコ�
 
 - [X アカウント (@arweavejp)](https://x.com/arweavejp)
 - [ディスコード](https://discord.gg/bB4N7fAMmp)
-- [メンバートークン取得](https://join.arweave.jp)
+- [メンバートークン取得](https://arweave.jp)
 - [ロゴのダウンロード](https://logo.arweave.jp)
