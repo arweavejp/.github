@@ -114,6 +114,8 @@ const balance = await mint(addr, "10.0")
 
 ### AR トークンを送金
 
+トランザクションの基本フローは `createTransaction`、`sign`、`post` です。 `createTransaction` のオプションに `data` または `target` と `quantity` が必須で、前者がデータ保存、後者が送金になります。送金とデータ保存を組み合わせることもできます。また、次のセクションにあるように任意の数のタグをトランザクションのメタデータに設定して `GraphQL` で柔軟に検索可能にすることができます。
+
 ```javascript
 const postTx = async (tx, jwk) => {
   await arweave.transactions.sign(tx, jwk)
@@ -138,6 +140,8 @@ await mint(addr1, "1.0")
 await transfer(jwk, addr2, "0.5")
 ```
 ### テキストデータを保存
+
+データを保存するには `craeteTransaction` のオプションにデータを指定して、 `Content-Type` タグを設定します。
 
 ```javascript
 const saveMD = async (md, jwk) => {
@@ -164,6 +168,7 @@ const saveSVG = async (svg, jwk) => {
   return await postTx(tx, jwk)
 }
 ```
+[AO のロゴ](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDI5IiBoZWlnaHQ9IjIxNCIgdmlld0JveD0iMCAwIDQyOSAyMTQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0wIDIxNEg3MS4zNzYzTDg1Ljk0MjkgMTc0LjYxTDUzLjE2ODEgMTA3LjVMMCAyMTRaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBkPSJNMTg5LjM2NiAxNjAuNzVMMTA5Ljk3OCAxTDg1Ljk0MjkgNTUuNzA4OUwxNjAuOTYxIDIxNEgyMTVMMTg5LjM2NiAxNjAuNzVaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMyMiAyMTRDMzgxLjA5NCAyMTQgNDI5IDE2Ni4wOTQgNDI5IDEwN0M0MjkgNDcuOTA1NSAzODEuMDk0IDAgMzIyIDBDMjYyLjkwNiAwIDIxNSA0Ny45MDU1IDIxNSAxMDdDMjE1IDE2Ni4wOTQgMjYyLjkwNiAyMTQgMzIyIDIxNFpNMzIyIDE3MkMzNTcuODk5IDE3MiAzODcgMTQyLjg5OSAzODcgMTA3QzM4NyA3MS4xMDE1IDM1Ny44OTkgNDIgMzIyIDQyQzI4Ni4xMDEgNDIgMjU3IDcxLjEwMTUgMjU3IDEwN0MyNTcgMTQyLjg5OSAyODYuMTAxIDE3MiAzMjIgMTcyWiIgZmlsbD0iYmxhY2siLz4KPC9zdmc+Cg==)を SVG 形式でアップロードしてみましょう。
 
 ```javascript
 const ao = "PHN2ZyB3aWR0aD0iNDI5IiBoZWlnaHQ9IjIxNCIgdmlld0JveD0iMCAwIDQyOSAyMTQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0wIDIxNEg3MS4zNzYzTDg1Ljk0MjkgMTc0LjYxTDUzLjE2ODEgMTA3LjVMMCAyMTRaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBkPSJNMTg5LjM2NiAxNjAuNzVMMTA5Ljk3OCAxTDg1Ljk0MjkgNTUuNzA4OUwxNjAuOTYxIDIxNEgyMTVMMTg5LjM2NiAxNjAuNzVaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMyMiAyMTRDMzgxLjA5NCAyMTQgNDI5IDE2Ni4wOTQgNDI5IDEwN0M0MjkgNDcuOTA1NSAzODEuMDk0IDAgMzIyIDBDMjYyLjkwNiAwIDIxNSA0Ny45MDU1IDIxNSAxMDdDMjE1IDE2Ni4wOTQgMjYyLjkwNiAyMTQgMzIyIDIxNFpNMzIyIDE3MkMzNTcuODk5IDE3MiAzODcgMTQyLjg5OSAzODcgMTA3QzM4NyA3MS4xMDE1IDM1Ny44OTkgNDIgMzIyIDQyQzI4Ni4xMDEgNDIgMjU3IDcxLjEwMTUgMjU3IDEwN0MyNTcgMTQyLjg5OSAyODYuMTAxIDE3MiAzMjIgMTcyWiIgZmlsbD0iYmxhY2siLz4KPC9zdmc+Cg=="
