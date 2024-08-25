@@ -1,13 +1,14 @@
 # aoBootcamp Vol.01
 
-[NodeJS v22](https://nodejs.org/) と [Docker](https://docker.com/) をインストールしてください。
-
 - [ローカル環境の設定](#ローカル環境の設定)
 - [Arweaveの基礎](#arweaveの基礎)
 - [AOS](#aos)
 - [独自VMの開発](#独自vmの開発)
+- [AOトークン設計](#aoトークン設計)
 
 ## ローカル環境の設定
+
+[NodeJS v22](https://nodejs.org/) と [Docker](https://docker.com/) をインストールしてください。
 
 ```bash
 git clone -b hotfix https://github.com/weavedb/ao-localnet.git
@@ -632,6 +633,8 @@ const res = await result({ process: pid, message: mid })
 console.log(res.Messages[0].Tags)
 ```
 
-## AO トークン設計
+## AOトークン設計
 
 お疲れさまでした！このように、 Arweave / AO の仕組みをゼロか積み上げて理解していくと分散型スーパーコンピュータを使ってあらゆる実用的で画期的なプロトコルが開発できることが理解できたかと思います。 AO トークンの発行から数ヶ月で 1000 億円近くまで集まった Ethereum レイヤー1 の TVL とそれが AO ネットワークにブリッジされる流動性は AO プロジェクトが aoETH としてフル活用することができます。また、 aoETH をうまく活用するプロジェクトには AO トークンが自動でミントされる仕組みになっています。完全フェアローンチでビットコインと同じ半減スケジュールでミントされる AO トークンは、その 33.3 % が AR トークン保持者に、 66.6 % が aoETH 保持者に5分毎に自動分配されます。 AR や aoETH をユーザーロックしたくなるようなプロジェクトを作れば、AO トークンがそのプロジェクトにどんどんたまっていきそれを資金にプロジェクトを回すことができるのです。ビットコインは発行１年目から何倍の価格になったでしょう？AO トークンはそれと同じ設計ですが、開発者やプロジェクトがマイニングできるトークン設計になっています。
+
+- 参照 : [AO ホワイトペーパー](https://5z7leszqicjtb6bjtij34ipnwjcwk3owtp7szjirboxmwudpd2tq.arweave.net/7n6ySzBAkzD4KZoTviHtskVlbdab_yylEQuuy1BvHqc)
