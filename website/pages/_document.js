@@ -7,6 +7,10 @@ export default function Document() {
         <title>Arweave Japan</title>
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Arweave Japan" />
+        <meta
+          name="twitter:description"
+          content="Arweave / AO 日本エコシステム"
+        />
         <meta name="twitter:image" content="https://arweave.jp/cover.png" />
         <meta property="og:title" content="Arweave Japan" />
         <meta name="og:description" content="Arweave / AO 日本エコシステム" />

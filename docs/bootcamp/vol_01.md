@@ -223,7 +223,7 @@ const data = await fetch(`http://localhost:4000/${txid}`).then((r)=> r.text())
 
 ### トランザクションをネストしてバンドル
 
-Arweave にはメタデータとして任意のタグとデータそのものを保存できますが、更に真価を発揮するのが [ANS-104 Bundled Data v2.0](https://github.com/ArweaveTeam/arweave-standards/blob/master/ans/ANS-104.md) 規格によってデータの部分にバイナリフォーマットでトランザクションを無限にネストできる仕組みです。１トランザクションに１００万トランザクションをネストして送ることもできます。このネストの仕組みで Arweave は無制限にスケールすることができます。バンドルフォーマットの作成には `arbundles` を使います。
+Arweave にはメタデータとして任意のタグとデータそのものを保存できますが、更に真価を発揮するのが [ANS-104 Bundled Data v2.0](https://specs.arweave.dev/?tx=xwOgX-MmqN5_-Ny_zNu2A8o-PnTGsoRb_3FrtiMAkuw) 規格によってデータの部分にバイナリフォーマットでトランザクションを無限にネストできる仕組みです。１トランザクションに１００万トランザクションをネストして送ることもできます。このネストの仕組みで Arweave は無制限にスケールすることができます。バンドルフォーマットの作成には `arbundles` を使います。
 
 ```bash
 npm i arbundles
