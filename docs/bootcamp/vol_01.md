@@ -15,12 +15,30 @@ cd ao-localnet/wallets && ./generateAll.sh
 cd ../ && sudo docker compose --profile explorer up
 ```
 
+Docker の起動に成功すると以下のノードがローカル環境で動きます。
+
+- ArLocal : [localhost:4000](http://localhost:4000) - Arweave ローカルゲートウェイ
+- GraphQL : [localhost:4000/graphql](http://localhost:4000/graphql) - Arweave GraphQL
+- Scar : [localhost:4006](http://localhost:4006) - Arweave ローカルエクスプローラ
+- MU : [localhost:4002](http://localhost:4002) - AO メッセンジャーユニット
+- SU : [localhost:4003](http://localhost:4003) - AO スケジューラユニット
+- CU : [localhost:4004](http://localhost:4004) - AO コンピュートユニット
+
+
+AOS の Wasm モジュールをダウンロードし AO のユニット運営に必要な各種ウォレットを生成して、ローカル AR トークンをミントします。 生成したウォレットでモジュールをローカル Arweave にアップロードします。モジュールのトランザクション ID が波線で表示されるのでメモしてください。最後のコマンドでウォレットのアドレスがリストされます。
+
 ```bash
 nvm use 22
 cd ao-localnet/seed && ./download-aos-module.sh
 ./seed-for-aos.sh
 cd ../wallets && node printWalletAddresses.mjs
 ```
+
+### 参照
+
+- [ao-localnet](https://github.com/permaweb/ao-localnet) （バグがあるので[修正版](https://github.com/weavedb/ao-localnet/tree/hotfix)を使っています）
+- [ArLocal](https://github.com/textury/arlocal)
+- [Scar](https://github.com/renzholy/scar)
 
 ## Arweaveの基礎
 
