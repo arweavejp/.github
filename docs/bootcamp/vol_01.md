@@ -264,7 +264,7 @@ AO は 上記した Arweave の `ANS-104` 規格をフル活用した、無制�
 AO の Lua ベース VM である AOS は、コマンドライン REPL から便利に使うこともできますが、ここでは `aoconnect` を使ってプログラマブルなアプローチをします。
 
 #### 
-- 
+
 - [AO スペック](https://ao.arweave.dev/#/read)
 - [AO クックブック](https://cookbook_ao.g8way.io/)
 - [aoconnect](https://cookbook_ao.g8way.io/guides/aoconnect/aoconnect.html)
