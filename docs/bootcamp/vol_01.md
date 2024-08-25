@@ -1,5 +1,12 @@
 # aoBootcamp Vol.01
 
+[NodeJS v22](https://nodejs.org/) と [Docker](https://docker.com/) をインストールしてください。
+
+- [ローカル環境の設定](#ローカル環境の設定)
+- [Arweaveの基礎](#arweaveの基礎)
+- [AOS](#aos)
+- [独自VMの開発](#独自vmの開発)
+
 ## ローカル環境の設定
 
 ```bash
@@ -15,7 +22,9 @@ cd ao-localnet/seed && ./download-aos-module.sh
 cd ../wallets && node printWalletAddresses.mjs
 ```
 
-## Arweave ゲートウェイへ接続
+## Arweaveの基礎
+
+### Arweave ゲートウェイへ接続
 
 ```bash
 npm i arweave
@@ -25,7 +34,7 @@ npm i arweave
 const arweave = require("arweave").init({ port: 4000 })
 ```
 
-## Arweave ウォレットの作成
+### Arweave ウォレットの作成
 
 ```javascript
 const addr = async jwk => arweave.wallets.jwkToAddress(jwk)
@@ -36,7 +45,7 @@ const gen = async () => {
 }
 ```
 
-## AR トークンをミント （ArLocal 限定）
+### AR トークンをミント （ArLocal 限定）
 
 ```javascript
 const mine = async () => await arweave.api.get(`/mine`)
@@ -52,7 +61,7 @@ const mint = async (addr, amount = "1.0") => {
 }
 ```
 
-## AR トークンを送金
+### AR トークンを送金
 
 ```javascript
 const postTx = async (tx, jwk) => {
@@ -77,7 +86,7 @@ const { addr: addr2 } = await gen()
 await mint(addr1, "1.0")
 await transfer(jwk, addr2, "0.5")
 ```
-## テキストデータを保存
+### テキストデータを保存
 
 ```javascript
 const saveMD = async (md, jwk) => {
@@ -93,7 +102,7 @@ const saveMD = async (md, jwk) => {
 await saveMD("# This is Markdown", jwk)
 ```
 
-## 画像データを保存
+### 画像データを保存
 
 ```javascript
 const saveSVG = async (svg, jwk) => {
@@ -110,7 +119,7 @@ const ao = "PHN2ZyB3aWR0aD0iNDI5IiBoZWlnaHQ9IjIxNCIgdmlld0JveD0iMCAwIDQyOSAyMTQi
 await saveSVG(ao, jwk)
 ```
 
-## GraphQL でトランザクションを取得
+### GraphQL でトランザクションを取得
 
 ```javascript
 const q = txid => `query {
@@ -132,7 +141,7 @@ const getTx = async txid => {
 
 ```
 
-## データを取得
+### データを取得
 
 ```javascript
 const data = await arweave.transactions.getData(
@@ -144,7 +153,8 @@ const data = await arweave.transactions.getData(
 const data = await fetch(`http://localhost:4000/${txid}`).then((r)=> r.text())
 ```
 
-## トランザクションをネストしてバンドル
+
+### トランザクションをネストしてバンドル
 
 ```bash
 npm i arbundles
@@ -284,10 +294,10 @@ const res2 = await dryrun({
 console.log(res2.Messages[0].Tags)
 ```
 
-## 独自 VM の開発
+## 独自VMの開発
 
 ```bash
-npm i express body-parser @perma
+npm i express body-parser @permaweb/ao-scheduler-utils
 ```
 
 ## Messenger Unit
