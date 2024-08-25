@@ -400,11 +400,15 @@ console.log(res2.Messages[0].Tags)
 
 ## 独自VMの開発
 
+AO　プロセスの処理は CU (コンピュートユニット)が行っていますが、 AOS モジュールは AO の実装の一例に過ぎず、独自のモジュールを開発することも可能ですし、実はモジュールが Wasm である必要もありません。CU はあるメッセージの実行結果を要求されると、まずそのプロセスからモジュールアドレスを特定し、モジュールメッセージから読み取れるプロセスのメタ情報等から Wasm のロード方法を判別し [ao-loader](https://github.com/permaweb/ao/tree/main/loader) を使ってプロセスの計算を実行します。AOS の Wasm モジュールは [ao CLI](https://github.com/permaweb/ao/tree/main/dev-cli) で Lua をコンパイル可能ですが、モジュールを ao-loader に互換性のない非 Wasm で書き換えても、それ専用のローダーを作ればよいのです。ここでは、簡単な Javascript のモジュールとそれに付随する CU / MU を開発してみます。SU は AOS のものをそのまま使います。SU はメッセージを並べて Arweave にアップロードする役割を担うだけなので、モジュールによって実装を変更する必要がありません。
+
 ```bash
 npm i express body-parser @permaweb/ao-scheduler-utils
 ```
 
 ## Messenger Unit
+
+メッセンジャーユニットの役割は、ユーザーから受け取ったバイナリメッセージを正当なものか判別して、 [ao-scheduler-utils](https://github.com/permaweb/ao/tree/main/scheduler-utils) を使ってプロセスを担当している SU の URL を特定しメッセージを横流しします。他にも CU の Result から発信されたメッセージを SU にルーティングする等の役割がありますが、ここではそれが発生しないモジュールを作ります。
 
 ```javascript
 const express = require("express")
@@ -474,6 +478,8 @@ node mu.js
 ```
 
 ### Compute Unit
+
+CU はあるトランザクションの結果を要求されると、そのプロセスからモジュールを特定してダウンロードするのとスケジューラを特定し SU から最新のメッセージまでを全て受け取りモジュールにインプットして遅延評価します。ここでは NodeJS の内臓 サンドボックス環境である `vm` を使って `Num` タグがメッセージに含まれていたらそれを Javascript に渡すだけの簡易ローダーを実装してみます。結果として現在の `Count` を Message で返します。
 
 ```javascript
 const vm = require("vm")
@@ -556,6 +562,8 @@ node cu.js
 
 ### Javascript Module を登録
 
+モジュールは Javascript の `handle` 関数で定義して、第一パラメータ（ステート）に第二パラメータを足して返信するだけのシンプルなロジックにします。これを AO のモジュールメッセージのスペックに準拠して `Module-Format` を `js-unknown-unknown` に変更してアップロードします。このモジュールフォーマットを検知した CU が先に定義したシンプルなローダーを使って遅延計算します。AO のメッセージスペックとは完全に準拠しているので AOS 等他のプロセスとインターオペラビリティを持ってメッセージの交換ができます。この様に、 AO はメッセージフォーマットをスペックとして定義しているだけで実装言語や技術スタックは自由なのです。 Ethereum や Solana の VM を AO に載っけることも可能です。
+
 ```javascript
 const js = `
 function handle(count, num) {
@@ -578,11 +586,13 @@ tx.addTag("Type", "Module")
 tx.addTag("Module-Format", "js-unknown-unknown")
 tx.addTag("Input-Encoding", "JSON-V1")
 tx.addTag("Output-Encoding", "JSON-V1")
-await postTx(tx, jwk)
+const module_txid = await postTx(tx, jwk)
 await wait(1000)
 ```
 
 ### Scheduler URL を登録
+
+プロセスを `spawn` する前に、 `Scheduler-Location` メッセージを使ってスケジューラアドレスに SU の URL を登録する必要があります。 MU と CU はこの情報を使って `ao-scheduler-utils` 等でプロセスのスケジューラを特定します。`Scheduler-Location` を署名する `jwk` のアドレスが URL の管理アドレスになります。これは DNS のように機能します。
 
 ```javascript
 let tx = await arweave.createTransaction({ data: "1984" })
@@ -597,16 +607,20 @@ await wait(1000)
 
 ### プロセスを spawn
 
+モジュールのトランザクション ID とスケジューラの管理アドレスを指定してプロセスを立ち上げるメッセージを `aoconnect`で `spawn` します。
+
 ```javascript
 const pid = await spawn({
-  module: tx0.id,
-  scheduler: addr1,
+  module: module_txid,
+  scheduler: addr,
   signer: createDataItemSigner(jwk),
 })
 await wait(1000)
 ```
 
 ### Message を送信
+
+作成した Javascript モジュールとプロセスを使ってみましょう。 `Num` タグをつけて `message` を送ります。この値が足されてレスポンスメッセージとして返ってきます。`Count` が `4` のタグが含まれていれば成功です。二回同じメッセージを実行すると `8` になります。
 
 ```javascript
 const mid = await message({
@@ -617,3 +631,7 @@ const mid = await message({
 const res = await result({ process: pid, message: mid })
 console.log(res.Messages[0].Tags)
 ```
+
+## AO トークン設計
+
+お疲れさまでした！このように、 Arweave / AO の仕組みをゼロか積み上げて理解していくと分散型スーパーコンピュータを使ってあらゆる実用的で画期的なプロトコルが開発できることが理解できたかと思います。 AO トークンの発行から数ヶ月で 1000 億円近くまで集まった Ethereum レイヤー1 の TVL とそれが AO ネットワークにブリッジされる流動性は AO プロジェクトが aoETH としてフル活用することができます。また、 aoETH をうまく活用するプロジェクトには AO トークンが自動でミントされる仕組みになっています。完全フェアローンチでビットコインと同じ半減スケジュールでミントされる AO トークンは、その 33.3 % が AR トークン保持者に、 66.6 % が aoETH 保持者に5分毎に自動分配されます。 AR や aoETH をユーザーロックしたくなるようなプロジェクトを作れば、AO トークンがそのプロジェクトにどんどんたまっていきそれを資金にプロジェクトを回すことができるのです。ビットコインは発行１年目から何倍の価格になったでしょう？AO トークンはそれと同じ設計ですが、開発者やプロジェクトがマイニングできるトークン設計になっています。
