@@ -25,7 +25,7 @@ Docker の起動に成功すると以下のノードがローカル環境で動�
 - CU : [localhost:4004](http://localhost:4004) - AO コンピュートユニット
 
 
-AOS の Wasm モジュールをダウンロードし AO のユニット運営に必要な各種ウォレットを生成して、ローカル AR トークンをミントします。 生成したウォレットでモジュールをローカル Arweave にアップロードします。モジュールのトランザクション ID が波線で表示されるのでメモしてください。最後のコマンドでウォレットのアドレスがリストされます。
+AOS の Wasm モジュールをダウンロードし AO のユニット運営に必要な各種ウォレットを生成して、ローカル AR トークンをミントします。 生成したウォレットでモジュールをローカル Arweave にアップロードします。モジュールのトランザクション ID が波線で表示されるのでメモしてください。最後のコマンドでウォレットのアドレスがリストされますので、こちらはスケージューラウォレットのアドレスをメモしてください。後に利用します。
 
 ```bash
 nvm use 22
@@ -256,10 +256,19 @@ const { items } = await bundle(
   jwk
 )
 ```
-
-次のセクションで取り扱う、 `AO` は `ANS-104` フォーマットのフル活用です。
+ネストしたトランザクションのデータ部分に更に無数のトランザクションをネストできます。ネストしたトランザクションやデータも、GraphQL やゲートウェイから即座に参照可能になります。次のセクションで取り扱う、 `AO` は `ANS-104` フォーマットのフル活用です。
 
 ## AOS
+
+### AO とは？
+
+AO は 上記した Arweave の `ANS-104` 規格をフル活用した、無制限に水平スケール可能な分散型スーパーコンピュータです。３つのユニット（ MU / SU / CU ）がそれぞれ分散化されて疎結合され、Ethereum のレイヤー１のリステーキングや AR トークンの保有によって発行される AO トークンによってセキュリティが担保されます。AO は単に非同期メッセージの共通フォーマットを定義したもので、その実装方法は定義されていません。 AOS は Lua 言語をベースとした AO 上の最初の VM 実装です。
+
+- 参照 : [AO スペック](https://ao.arweave.dev/#/read)
+
+AO の Lua ベースの VM である AOS は、コマンドライン REPL から便利に使うこともできますが、ここでは `aoconnect` を使ってプログラマブルなアプローチをします。
+
+- 参照 : [aoconnect](https://cookbook_ao.g8way.io/guides/aoconnect/aoconnect.html)
 
 ### ユニットに接続
 
@@ -267,6 +276,7 @@ const { items } = await bundle(
 npm i @permaweb/aoconnect
 ```
 
+メインネット環境では `connect` を使う必要はありませんが、今回はローカル環境のユニットに接続するため `connect` で各種 URL を指定します。
 
 ```javascript
 const { createDataItemSigner, connect } = require("@permaweb/aoconnect")
@@ -279,7 +289,17 @@ const { result, message, spawn, dryrun } = connect(
 )
 ```
 
+ただし、ローカル環境で AO / AOS を使うと、デバッグに非常に便利な [ao.link](https://ao.link) エクスプローラが使えなくなるため、 Arweave メインネットに保存してテストする形の方が便利かもしれません。その場合、`aoconnect` を以下のようにして使えます。
+
+```javascript
+const { result, message, spawn, dryrun } = require("@permaweb/aoconnect")
+```
+
 ### AOS プロセスを spawn
+
+AO の仕組みを簡潔に説明すると、まずバイナリ形式の Wasm モジュールを Arwaeve に保存します。そして各プロセスが Wasm モジュールをインスタンス化して 4GB (Wasm32) または、 16GB (Wasm64) のメモリを持つことができます。プロセスにユーザーや別のプロセスが非同期にメッセージを送りそれがモジュールにインプットされてメモリを更新していきます。各プロセスから任意の `message` や別のプロセスを `spawn` したり、 `cron` を使って定期的にメッセージを生成することで完全に `Autonomous` な スマートコントラクト を動かすことができます。また、拡張機能を使って LLM の推論をオンチェーンに載せて Autonomous な AI を動かすこともできます。
+
+ローカル環境立ち上げ時にメモした Module のトランザクション ID と　スケジューラウォレットを指定して、AOS モジュールをインスタンス化したプロセスを立ち上げましょう。
 
 ```javascript
 const wait = ms => new Promise(res => setTimeout(() => res(), ms))
@@ -296,6 +316,10 @@ console.log(await getTx(pid))
 ```
 
 ### Lua ハンドラーを作成
+
+インスタンス化した、プロセスには任意の Lua スクリプトを追加することができます。`Handlers.add` と `hasMatchingTag` を使ってタグにマッチした際に実行する関数を定義するのが一般的です。スクリプトは `eval` によって評価され既にデプロイ済みのスクリプトに後付けされます。これにより、指定済みの既存の変数などを上書きすることができます。
+
+簡単な Key-Value ストアを実装してみます。
 
 ```lua
 local ao = require('ao')
@@ -326,6 +350,8 @@ Handlers.add(
 
 ### ハンドラーを登録
 
+Lua スクリプトを作成したら、 `Eval` アクションによってプロセスに追加します。これは AOS REPL の `.load [script-name.lua]` と同じです。
+
 ```javascript
 const { readFileSync } = require("fs")
 const { resolve } = require("path")
@@ -341,6 +367,8 @@ const mid = await message({
 const res = await result({ process: pid, message: mid })
 console.log(res)
 ```
+
+追加したハンドラーを使ってみます。書き込みをする際は `message` を使いますが、読み取りだけの場合は `dryrun` を使います。この場合、Arweave にメッセージが保存せずに現状の状態だけを取得することができます。読み取りを `message` で記録することも可能ですが、これはプロセス同士がある瞬間の状態の記録を取って参照する場合等に使います。
 
 ```javascript
 const mid1 = await message({
@@ -365,6 +393,10 @@ const res2 = await dryrun({
 })
 console.log(res2.Messages[0].Tags)
 ```
+
+他にも、AOS では既存メッセージの `Assign` によって Arweave に保存されたデータを読み込んだり、 `Cron` を設定して `Monitor` することでプロセスを Autonomous にしたりと他のブロックチェーンでは不可能な処理を実行することが可能です。
+
+- [AOS チュートリアル](https://cookbook_ao.g8way.io/welcome/index.html)
 
 ## 独自VMの開発
 
