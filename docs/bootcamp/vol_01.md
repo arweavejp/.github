@@ -501,19 +501,26 @@ const getTag = (name, tags) => {
   return null
 }
 
-const q = txid => `query {      
-    transactions(ids: ["${txid}"]) {     
-        edges {                        
-            node { id tags { name value } owner { address } }
-        }                                   
-    }       
+const q = txid => `query {
+    transactions(ids: ["${txid}"]) {
+        edges {
+            node {
+                id
+                tags { name value }
+                owner { address }
+            }
+        }
+    }
 }`
 
 let modules = {}
+let schs = {}
+let results = {}
+let lasts = {}
+
 app.get("/result/:mid", async (req, res) => {
   const { ["process-id"]: pid } = req.query
   const { mid } = req.params
-  
   const json = await fetch("http://localhost:4000/graphql", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -524,24 +531,33 @@ app.get("/result/:mid", async (req, res) => {
     let js = await fetch(`http://localhost:4000/${module}`).then(r => r.text())
     modules[pid] = { code: js, id: module, state: { count: 0 } }
   }
-  const json2 = await fetch("http://localhost:4000/graphql", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: q(mid) }),
-  }).then(r => r.json())
-  const num = getTag("Num", json2.data.transactions.edges[0].node.tags)
-  const code =
-    modules[pid].code + `
-    count = handle(count, ${num * 1});`
-  const context = vm.createContext(modules[pid].state)
-  vm.runInContext(code, context)
-  modules[pid].state = context
+  if (!schs[pid]) {
+    const { url } = await locate(pid)
+    schs[pid] = url
+  }
+  let _url = `${schs[pid]}/${pid}`
+  if (lasts[pid]) _url += `?from=${lasts[pid]}`
+  const { page_info, edges } = await fetch(_url).then(r => r.json())
+  for (const v of edges) {
+    const mid = v.node.message.id
+    if (!results[mid]) {
+      const num = getTag("Num", v.node.message.tags)
+      const code =
+        modules[pid].code +
+        `
+count = handle(count, ${num * 1});
+`
+      const context = vm.createContext(modules[pid].state)
+      vm.runInContext(code, context)
+      modules[pid].state = context
+      results[mid] = context
+      lasts[pid] = v.cursor
+    }
+  }
   res.json({
     Messages: [
       {
-        Tags: [
-          { name: "Count", value: Number(modules[pid].state.count).toString() },
-        ],
+        Tags: [{ name: "Count", value: Number(results[mid].count).toString() }],
       },
     ],
   })
