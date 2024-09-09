@@ -125,12 +125,12 @@ const postTx = async (tx, jwk) => {
   return tx.id
 }
 
-const transfer = async (jwk, to, amount) => {
+const transfer = async (amount, to , jwk) => {
   let tx = await arweave.createTransaction({
     target: to,
     quantity: arweave.ar.arToWinston(amount),
   })
-  return postTx(tx, jwk)
+  return await postTx(tx, jwk)
 }
 ```
 
@@ -138,8 +138,9 @@ const transfer = async (jwk, to, amount) => {
 const { addr: addr1, jwk } = await gen()
 const { addr: addr2 } = await gen()
 await mint(addr1, "1.0")
-await transfer(jwk, addr2, "0.5")
+await transfer("0.5", addr2, jwk)
 ```
+
 ### テキストデータを保存
 
 データを保存するには `craeteTransaction` のオプションにデータを指定して、 `Content-Type` タグを設定します。

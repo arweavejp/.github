@@ -4,6 +4,7 @@ import { RouterProvider, createHashRouter } from "react-router-dom"
 import { createRoot } from "react-dom/client"
 import App from "./App.jsx"
 import Bootcamp from "./pages/Bootcamp"
+import AtomicNotes from "./pages/AtomicNotes"
 import { ChakraProvider } from "@chakra-ui/react"
 
 const router = createHashRouter([
@@ -14,6 +15,10 @@ const router = createHashRouter([
   {
     path: "/bootcamp",
     element: <Bootcamp />,
+  },
+  {
+    path: "/atomic-notes",
+    element: <AtomicNotes />,
   },
 ])
 
