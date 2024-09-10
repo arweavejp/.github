@@ -140,18 +140,7 @@ color: ${text};
             </Flex>
           </Flex>
           <Box flex={1} />
-          <Flex
-            ml={4}
-            py={1}
-            align="center"
-            justify="center"
-            onClick={() => {}}
-            sx={{
-              borderRadius: "5px",
-              cursor: "pointer",
-              ":hover": { opacity: 0.75 },
-            }}
-          >
+          <Flex ml={4} py={1} align="center" justify="center">
             Download
           </Flex>
           <Flex
@@ -226,15 +215,7 @@ color: ${text};
               border: `1px solid ${isBG ? "#ccc" : isPadding ? color2 : bg}`,
             }}
           >
-            <Box
-              as="svg"
-              id="logo"
-              h={h}
-              w={`${w}px`}
-              sx={{
-                cursor: "pointer",
-              }}
-            >
+            <Box as="svg" id="logo" h={h} w={`${w}px`}>
               <defs>
                 <style type="text/css">{font}</style>
               </defs>

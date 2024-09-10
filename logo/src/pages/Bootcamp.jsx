@@ -203,15 +203,7 @@ color: ${text};
               border: `1px solid ${isBG ? "#ccc" : isPadding ? color2 : bg}`,
             }}
           >
-            <Box
-              as="svg"
-              id="logo"
-              h={h}
-              w={`${w}px`}
-              sx={{
-                cursor: "pointer",
-              }}
-            >
+            <Box as="svg" id="logo" h={h} w={`${w}px`}>
               <defs>
                 <style type="text/css">{font}</style>
               </defs>
